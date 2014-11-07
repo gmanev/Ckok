@@ -5,6 +5,7 @@
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <modules>
-  	<module>features</module>
+  	<module>ckok-features</module>
+  	<module>ckok-model</module>
   </modules>
 </project>
