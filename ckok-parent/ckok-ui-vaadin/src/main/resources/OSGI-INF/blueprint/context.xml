@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+	 xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="
+	 	http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+	 	http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0 http://svn.apache.org/repos/asf/aries/trunk/blueprint/blueprint-cm/src/main/resources/org/apache/aries/blueprint/compendium/cm/blueprint-cm-1.1.0.xsd
+	 ">
+
+	<reference id="daoService" availability="mandatory" interface="net.nbt.ckok.model.CkokDAOService" />
+
+	<bean id="appFactory" class="net.nbt.ckok.vaadin.CkokAppFactory">
+		<argument ref="daoService"/>
+		<argument value="CKOK ${project.version}"/>		
+	</bean>
+
+	<service ref="appFactory" interface="org.example.utils.vaadinbridge.ApplicationFactory">
+		<service-properties>
+			<entry key="alias" value="/ckok-vaadin" />
+		</service-properties>
+	</service>
+	
+</blueprint>

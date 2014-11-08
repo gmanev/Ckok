@@ -7,5 +7,7 @@
   <modules>
   	<module>ckok-features</module>
   	<module>ckok-model</module>
+  	<module>ckok-dao-jpa</module>
+  	<module>ckok-ui-vaadin</module>
   </modules>
 </project>
