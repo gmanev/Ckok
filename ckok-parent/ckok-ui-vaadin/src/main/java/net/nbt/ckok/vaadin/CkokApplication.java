@@ -4,7 +4,10 @@ package net.nbt.ckok.vaadin;
 import java.util.Locale;
 
 import net.nbt.ckok.model.CkokDAOService;
+import net.nbt.ckok.model.DAO;
 import net.nbt.ckok.model.Product;
+
+import org.apache.log4j.Logger;
 
 import com.vaadin.Application;
 import com.vaadin.data.Item;
@@ -14,6 +17,9 @@ import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.MenuBar;
+import com.vaadin.ui.MenuBar.Command;
+import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
 
@@ -21,11 +27,13 @@ import com.vaadin.ui.Window;
 class CkokApplication extends Application {
 
     private static final Object[] VISIBLE_COLUMNS = new Object[] {"serial", "supplier", "notes"};
-    private final CkokDAOService daoService;
     private final String title;
-
+    private DAO<Product> productDAO;
+    
+    private final Logger log = Logger.getLogger(CkokApplication.class);
+    
     CkokApplication(CkokDAOService daoService, String title) {
-        this.daoService = daoService;
+        this.productDAO = daoService.getProductDAO();
         this.title = title;
     }
 
@@ -42,8 +50,9 @@ class CkokApplication extends Application {
         final Form form = new Form();
         form.setLocale(Locale.GERMAN);
         final Table table = new Table(this.title, beans);
-  //      MenuBar menu = createMenuBar(beans, table);
-  //      layout.addComponent(menu);
+        
+        MenuBar menu = createMenuBar(beans, table);
+        layout.addComponent(menu);
         
         table.setSelectable(true);
         table.setImmediate(true);
@@ -69,15 +78,15 @@ class CkokApplication extends Application {
         form.setImmediate(true);
         form.addListener(new Property.ValueChangeListener() {
             public void valueChange(ValueChangeEvent event) {
-                @SuppressWarnings("unchecked")
-                BeanItem<Product> item = (BeanItem<Product>) form.getItemDataSource();
-                //taskService.updateTask(item.getBean());
+               @SuppressWarnings("unchecked")
+               BeanItem<Product> item = (BeanItem<Product>) form.getItemDataSource();
+               productDAO.update(item.getBean());
             }
         });
         layout.addComponent(form);
     }
-/*
-    private MenuBar createMenuBar(final BeanContainer<String, Task> beans, final Table table) {
+
+    private MenuBar createMenuBar(final BeanContainer<String, Product> beans, final Table table) {
         MenuBar menu = new MenuBar();
         menu.setImmediate(true);
         menu.addItem("Reload", new Command() {
@@ -85,7 +94,7 @@ class CkokApplication extends Application {
                 update(beans);
             }
         });
-        menu.addItem("Add", new Command() {
+/*        menu.addItem("Add", new Command() {
             public void menuSelected(MenuItem selectedItem) {
                 Task task = new Task();
                 task.setId(UUID.randomUUID().toString());
@@ -101,13 +110,13 @@ class CkokApplication extends Application {
                 taskService.deleteTask(id);
                 table.removeItem(id);
             }
-        });
+        });*/
         return menu;
     }
-*/
+
     private void update(final BeanContainer<String, Product> beans) {
         beans.removeAllItems();
-        beans.addAll(daoService.getProductDAO().getAll());
+        beans.addAll(productDAO.getAll());
     }
 
     

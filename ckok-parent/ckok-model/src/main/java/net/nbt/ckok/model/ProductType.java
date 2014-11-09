@@ -1,5 +1,20 @@
 package net.nbt.ckok.model;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+
+@Entity
+@Table(name="CKOK_NOMEN")
 public class ProductType {
+	
+	@Id
+	@Column(name="NOMEN_ID")
+	@GeneratedValue(strategy=GenerationType.TABLE)
 	private int id;
 	private String partnum;
 	private String name;

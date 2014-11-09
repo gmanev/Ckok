@@ -24,12 +24,16 @@ public class JpaDAO<T> implements DAO<T> {
 
 	@Override
 	public T update(T entity) {
-		return em.merge(entity);
+		System.out.println(entity);
+		em.persist(entity);
+		em.flush();
+		return entity;
 	}
 
 	@Override
 	public void delete(T entity) {
 		em.remove(entity);
+		em.flush();
 	}
 
 	@Override

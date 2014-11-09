@@ -23,7 +23,9 @@
 
     <persistence-unit name="ckok" transaction-type="JTA">
         <jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=jdbc/oracleds)</jta-data-source>
-        <mapping-file>META-INF/orm.xml</mapping-file>
+        <!--  <mapping-file>META-INF/orm.xml</mapping-file> -->
+        <class>net.nbt.ckok.model.ProductType</class>
+        <class>net.nbt.ckok.model.Product</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
        
         <properties>
