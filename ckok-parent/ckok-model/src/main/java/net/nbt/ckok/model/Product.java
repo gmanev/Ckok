@@ -26,8 +26,6 @@ public class Product {
 	private String supplier;
 	private String notes;
 	
-	public Product() {}
-	
 	public int getId() {
 		return id;
 	}

@@ -7,14 +7,14 @@
 	 	http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0 http://svn.apache.org/repos/asf/aries/trunk/blueprint/blueprint-cm/src/main/resources/org/apache/aries/blueprint/compendium/cm/blueprint-cm-1.1.0.xsd
 	 ">
 
-	<reference id="daoService" availability="mandatory" interface="net.nbt.ckok.model.CkokDAOService" />
+	<reference id="productDAO" availability="mandatory" interface="net.nbt.ckok.model.ProductDAO" />
 
 	<bean id="appFactory" class="net.nbt.ckok.vaadin.CkokAppFactory">
-		<argument ref="daoService"/>
+		<argument ref="productDAO"/>
 		<argument value="CKOK ${project.version}"/>		
 	</bean>
 
-	<service ref="appFactory" interface="org.example.utils.vaadinbridge.ApplicationFactory">
+	<service ref="appFactory" interface="com.jjinterna.vaadin.vaadinbridge.ApplicationFactory">
 		<service-properties>
 			<entry key="alias" value="/ckok-vaadin" />
 		</service-properties>

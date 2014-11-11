@@ -20,8 +20,6 @@ public class ProductType {
 	private String name;
 	private String measure;
 
-	public ProductType() {}
-	
 	public int getId() {
 		return id;
 	}

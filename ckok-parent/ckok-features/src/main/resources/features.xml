@@ -9,8 +9,8 @@
     <feature name="ckok-ui-vaadin" version="${pom.version}">
         <feature>ckok</feature>
         <bundle>mvn:com.vaadin/vaadin/6.8.15</bundle>
-        <bundle>mvn:net.lr/vaadinbridge/1.0.0-SNAPSHOT</bundle>
+        <bundle>mvn:com.jjinterna.vaadin/vaadin-bridge/1.0.0-SNAPSHOT</bundle>
         <bundle>mvn:net.nbt.ckok/ckok-ui-vaadin/${pom.version}</bundle>
     </feature>
-
+ 
 </features>

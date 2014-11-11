@@ -1,13 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>net.nbt.ckok</groupId>
-  <artifactId>ckok-parent</artifactId>
+  <groupId>net.nbt.vaadin</groupId>
+  <artifactId>vaadin-parent</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <modules>
-  	<module>ckok-features</module>
-  	<module>ckok-model</module>
-   	<module>ckok-dao-jpa</module>
-  	<module>ckok-ui-vaadin</module>
-  </modules>
 </project>

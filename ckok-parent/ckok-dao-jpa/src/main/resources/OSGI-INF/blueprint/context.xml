@@ -9,14 +9,14 @@
 			http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0 
 			http://www.w3.org/2001/XMLSchema-instance http://www.w3.org/2001/XMLSchema-instance 
 			http://aries.apache.org/xmlns/jpa/v1.0.0 http://aries.apache.org/xmlns/jpa/v1.0.0 
-			http://aries.apache.org/xmlns/transactions/v1.0.0 http://aries.apache.org/xmlns/transactions/v1.0.0 ">
+			http://aries.apache.org/xmlns/transactions/v1.0.0 http://aries.apache.org/xmlns/transactions/v1.0.0">
 
-  <bean id="daoService" class="net.nbt.ckok.dao.jpa.impl.CkokDAOServiceImpl"> 
+  <bean id="productDAO" class="net.nbt.ckok.dao.jpa.impl.ProductDAOImpl"> 
       <jpa:context unitname="ckok" property="entityManager"/>
       <tx:transaction method="*" value="Required"/>
   </bean>
   
-	<service ref="daoService" interface="net.nbt.ckok.model.CkokDAOService">
+	<service ref="productDAO" interface="net.nbt.ckok.model.ProductDAO">
 		<service-properties>
 			<!-- This property is only important for the DOSGi tutorial -->
 			<entry key="service.exported.interfaces" value="*"/>

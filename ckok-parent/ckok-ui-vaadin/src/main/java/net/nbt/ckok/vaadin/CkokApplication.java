@@ -3,9 +3,8 @@ package net.nbt.ckok.vaadin;
 
 import java.util.Locale;
 
-import net.nbt.ckok.model.CkokDAOService;
-import net.nbt.ckok.model.DAO;
 import net.nbt.ckok.model.Product;
+import net.nbt.ckok.model.ProductDAO;
 
 import org.apache.log4j.Logger;
 
@@ -13,8 +12,12 @@ import com.vaadin.Application;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.BeanItem;
+import com.vaadin.ui.AbstractField;
+import com.vaadin.ui.DefaultFieldFactory;
+import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.MenuBar;
@@ -28,12 +31,12 @@ class CkokApplication extends Application {
 
     private static final Object[] VISIBLE_COLUMNS = new Object[] {"serial", "supplier", "notes"};
     private final String title;
-    private DAO<Product> productDAO;
+    private ProductDAO productDAO;
     
     private final Logger log = Logger.getLogger(CkokApplication.class);
     
-    CkokApplication(CkokDAOService daoService, String title) {
-        this.productDAO = daoService.getProductDAO();
+    CkokApplication(ProductDAO productDAO, String title) {
+        this.productDAO = productDAO;
         this.title = title;
     }
 
@@ -76,13 +79,32 @@ class CkokApplication extends Application {
         form.setCaption("Edit Task");
         form.setVisibleItemProperties(VISIBLE_COLUMNS);
         form.setImmediate(true);
+        form.setFormFieldFactory(new DefaultFieldFactory() {
+            @Override
+            public Field createField(Item item, Object propertyId, com.vaadin.ui.Component uiContext) {
+                final AbstractField field = (AbstractField)
+                        super.createField(item, propertyId, uiContext);
+                field.addListener(new ValueChangeListener() {
+                    @Override
+                    public void valueChange(ValueChangeEvent event) {
+                        BeanItem<Product> item = (BeanItem<Product>) form.getItemDataSource();
+                        productDAO.update(item.getBean());
+                        //submit.setEnabled(form.isModified());
+                    }
+                });
+                field.setImmediate(true);
+               
+                return field;
+            }        	
+        });
+        /*
         form.addListener(new Property.ValueChangeListener() {
             public void valueChange(ValueChangeEvent event) {
                @SuppressWarnings("unchecked")
                BeanItem<Product> item = (BeanItem<Product>) form.getItemDataSource();
                productDAO.update(item.getBean());
             }
-        });
+        });*/
         layout.addComponent(form);
     }
 
