@@ -22,8 +22,7 @@
     version="1.0">
 
     <persistence-unit name="ckok" transaction-type="JTA">
-        <jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=jdbc/oracleds)</jta-data-source>
-        <!--  <mapping-file>META-INF/orm.xml</mapping-file> -->
+        <jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=jdbc/derbyds)</jta-data-source>
         <class>net.nbt.ckok.model.ProductType</class>
         <class>net.nbt.ckok.model.Product</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
@@ -34,9 +33,9 @@
 <!--             <property name="openjpa.jdbc.UpdateManager" value="org.apache.openjpa.jdbc.kernel.BatchingConstraintUpdateManager"/> -->
             <!-- These properties are creating the database on the fly. We are using them to avoid users having
             to create a database to run the sample. This is not something that should be used in production.
-            See also the create=true line in the ariestrader-derby-ds blueprint meta data 
+            See also the create=true line in the ariestrader-derby-ds blueprint meta data -->
             <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema"/>
-            <property name="openjpa.jdbc.DBDictionary" value="oracle"/>-->
+            <property name="openjpa.jdbc.DBDictionary" value="derby"/> 
         </properties>
     </persistence-unit>
 
