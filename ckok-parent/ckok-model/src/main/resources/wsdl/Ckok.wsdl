@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://ckok.nbt.net/service" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="Ckok" targetNamespace="http://ckok.nbt.net/service">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://ckok.nbt.net/service">
+
+   <xsd:import schemaLocation="ckok.xsd" namespace="http://ckok.nbt.net/model"/>
+
+	<xsd:element name="call">
+     	<xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="phoneNumber" type="xsd:string"/>
+            <xsd:element name="orderNumber" type="xsd:string"/>
+            <xsd:element name="confirmationNumber" type="xsd:string"/>
+          </xsd:sequence>
+		</xsd:complexType>	
+	</xsd:element>
+      
+	<xsd:element name="callResponse">
+		<xsd:complexType>
+    		<xsd:sequence>
+            	<xsd:element name="causeCode" type="xsd:string"/>            
+            	<xsd:element name="userInput" type="xsd:string"/>
+            	<xsd:element name="callerIDNumber" type="xsd:string" minOccurs="0" maxOccurs="1" />
+        	</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+      <xsd:element name="queueCall">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="phoneNumber" type="xsd:string"/>
+            <xsd:element name="orderNumber" type="xsd:string"/>
+            <xsd:element name="confirmationNumber" type="xsd:string"/>
+            <xsd:element name="companyId" type="xsd:string" minOccurs="0" maxOccurs="1" />            
+            <xsd:element name="sendDTMF" type="xsd:string" minOccurs="0" maxOccurs="1" />            
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      
+      <xsd:element name="queueCallResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="correlationID" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="telephonyException" type="xsd:string" />
+
+      <xsd:element name="messagingException" type="xsd:string" />
+
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="queueCallRequest">
+    <wsdl:part element="tns:queueCall" name="parameters" />
+  </wsdl:message>
+  <wsdl:message name="queueCallResponse">
+    <wsdl:part element="tns:queueCallResponse" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="callRequest">
+    <wsdl:part element="tns:call" name="parameters" />
+  </wsdl:message>
+  <wsdl:message name="callResponse">
+    <wsdl:part element="tns:callResponse" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="messagingException">
+    <wsdl:part element="tns:messagingException" name="exception" />
+  </wsdl:message>
+  <wsdl:message name="telephonyException">
+    <wsdl:part element="tns:telephonyException" name="exception" />
+  </wsdl:message>  
+  <wsdl:portType name="CkokPortType">
+    <wsdl:operation name="queueCall">
+      <wsdl:input message="tns:queueCallRequest" name="queueCallRequest"/>
+      <wsdl:output message="tns:queueCallResponse" name="queueCallResponse"/>
+      <wsdl:fault message="tns:messagingException" name="messagingException" />      
+    </wsdl:operation>
+    <wsdl:operation name="call">
+      <wsdl:input message="tns:callRequest" name="callRequest"/>
+      <wsdl:output message="tns:callResponse" name="callResponse"/>
+	  <wsdl:fault message="tns:telephonyException" name="telephonyException" />      
+    </wsdl:operation>    
+  </wsdl:portType>
+  <wsdl:binding name="CkokSoapBinding" type="tns:CkokPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="queueCall">
+      <soap:operation soapAction=""/>
+      <wsdl:input name="queueCallRequest">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="queueCallResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+   
+      <wsdl:fault name="messagingException">
+		<soap:fault name="messagingException" use="literal"/>      
+      </wsdl:fault>       
+    </wsdl:operation> 
+    <wsdl:operation name="call">
+      <soap:operation soapAction=""/>
+      <wsdl:input name="callRequest">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="callResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="telephonyException">
+		<soap:fault name="telephonyException" use="literal"/>      
+      </wsdl:fault>      
+    </wsdl:operation>    
+  </wsdl:binding>
+  <wsdl:service name="CkokService">
+    <wsdl:port binding="tns:CkokSoapBinding" name="Ckok">
+      <soap:address location="http://localhost:8181/cxf/ckokService"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

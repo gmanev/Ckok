@@ -23,11 +23,12 @@
 
     <persistence-unit name="ckokTest" transaction-type="RESOURCE_LOCAL">
         <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=jdbc/derbyds)</non-jta-data-source>
-        <class>net.nbt.ckok.model.ProductType</class>
         <class>net.nbt.ckok.model.Product</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
 
         <properties>
+            <property name="openjpa.DynamicEnhancementAgent" value="false"/>        
+ 	        
 <!--             <property name="openjpa.BrokerImpl" value="non-finalizing" />  -->
 <!--             <property name="openjpa.Sequence" value="table(Table=OPENJPASEQ, Increment=100)"/> -->
 <!--             <property name="openjpa.jdbc.UpdateManager" value="org.apache.openjpa.jdbc.kernel.BatchingConstraintUpdateManager"/> -->

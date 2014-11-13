@@ -1,0 +1,26 @@
+<xsd:schema
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:tns="http://ckok.nbt.net/model"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified"
+    targetNamespace="http://ckok.nbt.net/model">
+
+    <xsd:complexType name="Product">
+        <xsd:sequence>
+            <xsd:element name="id" type="xsd:int" minOccurs="0"/>
+            <xsd:element name="quantity" type="xsd:int" minOccurs="0"/>
+            <xsd:element name="serial" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="supplier" type="xsd:string"/>            
+            <xsd:element name="notes" type="xsd:string"/>   
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <!-- 
+    <xs:simpleType name="customerType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="PRIVATE" />
+            <xs:enumeration value="BUSINESS" />
+        </xs:restriction>
+    </xs:simpleType>
+     -->
+</xsd:schema>
