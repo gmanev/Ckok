@@ -16,7 +16,7 @@
       <tx:transaction method="*" value="Required"/>
   </bean>
   
-	<service ref="productDAO" interface="net.nbt.ckok.model.ProductDAO">
+	<service ref="productDAO" interface="net.nbt.ckok.model.dao.ProductDAO">
 		<service-properties>
 			<!-- This property is only important for the DOSGi tutorial -->
 			<entry key="service.exported.interfaces" value="*"/>

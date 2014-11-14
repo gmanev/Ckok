@@ -1,6 +1,6 @@
 package net.nbt.ckok.vaadin;
 
-import net.nbt.ckok.model.ProductDAO;
+import net.nbt.ckok.service.CkokService;
 
 import com.jjinterna.vaadin.vaadinbridge.ApplicationFactory;
 import com.vaadin.Application;
@@ -8,11 +8,11 @@ import com.vaadin.Application.SystemMessages;
 
 public class CkokAppFactory implements ApplicationFactory {
     
-    private final ProductDAO productDAO;
+    private final CkokService service;
     private final String title;
 
-    public CkokAppFactory(ProductDAO productDAO, String title) {
-        this.productDAO = productDAO;
+    public CkokAppFactory(CkokService service, String title) {
+        this.service = service;
         this.title = title;
     }
     
@@ -25,6 +25,6 @@ public class CkokAppFactory implements ApplicationFactory {
     }
 
     public Application newInstance() {
-        return new CkokApplication(productDAO, title);
+        return new CkokApplication(service, title);
     }
 }

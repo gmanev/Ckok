@@ -4,12 +4,14 @@
     <feature name="ckok" version="${pom.version}">
         <bundle>mvn:net.nbt.ckok/ckok-model/${pom.version}</bundle>
         <bundle>mvn:net.nbt.ckok/ckok-dao-jpa/${pom.version}</bundle>
+        <bundle>mvn:net.nbt.ckok/ckok-server/${pom.version}</bundle>
     </feature>
 
     <feature name="ckok-ui-vaadin" version="${pom.version}">
-        <feature>ckok</feature>
         <bundle>mvn:com.vaadin/vaadin/6.8.15</bundle>
         <bundle>mvn:com.jjinterna.vaadin/vaadin-bridge/1.0.0-SNAPSHOT</bundle>
+        <bundle>mvn:net.nbt.ckok/ckok-model/${pom.version}</bundle>
+        <bundle>mvn:net.nbt.ckok/ckok-proxy/${pom.version}</bundle>
         <bundle>mvn:net.nbt.ckok/ckok-ui-vaadin/${pom.version}</bundle>
     </feature>
  

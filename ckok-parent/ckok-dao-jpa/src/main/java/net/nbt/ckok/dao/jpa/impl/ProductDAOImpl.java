@@ -1,11 +1,11 @@
 package net.nbt.ckok.dao.jpa.impl;
 
-import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 
-import net.nbt.ckok.model.ProductDAO;
 import net.nbt.ckok.model.Product;
+import net.nbt.ckok.model.dao.ProductDAO;
 
 public class ProductDAOImpl implements ProductDAO {
 
@@ -34,7 +34,12 @@ public class ProductDAOImpl implements ProductDAO {
 	}
 
 	@Override
-	public Collection<Product> getAll() {
+	public List<Product> getAll() {
 		return em.createQuery("SELECT p FROM Product p", Product.class).getResultList();
+	}
+
+	@Override
+	public Product find(int productId) {
+		return em.find(Product.class, productId);
 	}
 }

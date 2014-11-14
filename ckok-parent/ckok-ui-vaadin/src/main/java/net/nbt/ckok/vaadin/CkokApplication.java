@@ -4,7 +4,9 @@ package net.nbt.ckok.vaadin;
 import java.util.Locale;
 
 import net.nbt.ckok.model.Product;
-import net.nbt.ckok.model.ProductDAO;
+import net.nbt.ckok.service.CkokService;
+import net.nbt.ckok.service.GetAllProducts;
+import net.nbt.ckok.service.UpdateProduct;
 
 import org.apache.log4j.Logger;
 
@@ -31,12 +33,12 @@ class CkokApplication extends Application {
 
     private static final Object[] VISIBLE_COLUMNS = new Object[] {"serial", "supplier", "notes"};
     private final String title;
-    private ProductDAO productDAO;
+    private CkokService service;
     
     private final Logger log = Logger.getLogger(CkokApplication.class);
     
-    CkokApplication(ProductDAO productDAO, String title) {
-        this.productDAO = productDAO;
+    CkokApplication(CkokService service, String title) {
+        this.service = service;
         this.title = title;
     }
 
@@ -88,7 +90,9 @@ class CkokApplication extends Application {
                     @Override
                     public void valueChange(ValueChangeEvent event) {
                         BeanItem<Product> item = (BeanItem<Product>) form.getItemDataSource();
-                        productDAO.update(item.getBean());
+                        UpdateProduct request = new UpdateProduct();
+                        request.setProduct(item.getBean());
+                        service.updateProduct(request);
                         //submit.setEnabled(form.isModified());
                     }
                 });
@@ -138,7 +142,7 @@ class CkokApplication extends Application {
 
     private void update(final BeanContainer<String, Product> beans) {
         beans.removeAllItems();
-        beans.addAll(productDAO.getAll());
+        beans.addAll(service.getAllProducts(new GetAllProducts()).getReturn());
     }
 
     

@@ -1,26 +1,49 @@
 <jaxb:bindings version="1.0" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
-    xmlns:hj="http://hyperjaxb3.jvnet.org/ejb/schemas/customizations"
-    xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
-    jaxb:extensionBindingPrefixes="xjc hj orm"
-    xmlns:test="urn:test">
-     
-    <jaxb:bindings schemaLocation="ckok.xsd" node="/xsd:schema">
-        <hj:ignored-package name="net.nbt.ckok.service"/>
-        <hj:persistence>
-            <hj:default-one-to-many fetch="EAGER"/>
-        </hj:persistence>
-    	<jaxb:bindings node="xsd:complexType[@name='Product']">
-        	<hj:entity>
-            	<orm:table name="CKOK_PRODUCTS"/>
-        	</hj:entity>
-    	</jaxb:bindings>        
-        <jaxb:bindings node="xsd:complexType[@name='Product']/xsd:sequence/xsd:element[@name='id']">
-            <hj:id>
-				<orm:column name="PRODUCT_ID"/>
-                <orm:generated-value strategy="TABLE"/>
-            </hj:id>
-        </jaxb:bindings>
-    </jaxb:bindings>
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+	xmlns:hj="http://hyperjaxb3.jvnet.org/ejb/schemas/customizations"
+	xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
+	jaxb:extensionBindingPrefixes="xjc hj orm" xmlns:test="urn:test">
+
+	<jaxb:bindings schemaLocation="ckok.xsd" node="/xsd:schema">
+		<hj:ignored-package name="net.nbt.ckok.service" />
+		<hj:persistence>
+			<hj:default-one-to-many fetch="EAGER" />
+		</hj:persistence>
+		<jaxb:bindings node="xsd:complexType[@name='ProductType']">
+			<hj:entity>
+				<orm:table name="CKOK_NOMEN" />
+			</hj:entity>
+			<jaxb:bindings node="xsd:sequence/xsd:element[@name='id']">
+				<hj:id>
+					<orm:column name="NOMEN_ID" />
+					<orm:generated-value strategy="TABLE" />
+				</hj:id>
+			</jaxb:bindings>
+			<jaxb:bindings node="xsd:sequence/xsd:element[@name='name']">
+				<hj:basic>
+					<orm:column name="NAME"></orm:column>
+				</hj:basic>
+			</jaxb:bindings>
+
+		</jaxb:bindings>
+
+		<jaxb:bindings node="xsd:complexType[@name='Product']">
+			<hj:entity>
+				<orm:table name="CKOK_PRODUCTS" />
+			</hj:entity>
+		</jaxb:bindings>
+		<jaxb:bindings
+			node="xsd:complexType[@name='Product']/xsd:sequence/xsd:element[@name='id']">
+			<hj:id>
+				<orm:column name="PRODUCT_ID" />
+				<orm:generated-value strategy="TABLE" />
+			</hj:id>
+		</jaxb:bindings>
+		<jaxb:bindings
+			node="xsd:complexType[@name='Product']/xsd:sequence/xsd:element[@name='productType']">
+			<hj:many-to-one>
+				<orm:join-column name="NOMEN_ID" />
+			</hj:many-to-one>
+		</jaxb:bindings>
+	</jaxb:bindings>
 </jaxb:bindings>

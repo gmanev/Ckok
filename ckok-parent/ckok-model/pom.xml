@@ -47,6 +47,7 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>openjpa-maven-plugin</artifactId>
 				<configuration>
+					<excludes>**/service/*</excludes>				
 					<addDefaultConstructor>true</addDefaultConstructor>
 					<enforcePropertyRestriction>true</enforcePropertyRestriction>
 				</configuration>
@@ -87,14 +88,6 @@
 			</plugin>
 
 			<plugin>
-				<groupId>org.jvnet.hyperjaxb3</groupId>
-				<artifactId>maven-hyperjaxb3-plugin</artifactId>
-				<configuration>
-					<variant>jpa2</variant>
-				</configuration>
-			</plugin>
-
-			<plugin>
 				<groupId>org.apache.cxf</groupId>
 				<artifactId>cxf-codegen-plugin</artifactId>
 				<version>2.7.4</version>
@@ -107,7 +100,7 @@
 					</dependency>
 					<dependency>
 						<groupId>org.jvnet.hyperjaxb3</groupId>
-						<artifactId>maven-hyperjaxb3-plugin</artifactId>
+						<artifactId>hyperjaxb3-ejb-plugin</artifactId>
 						<version>0.6.0</version>
 					</dependency>
 				</dependencies>
@@ -130,7 +123,7 @@
 										<!-- <extraarg>-xjc-XhashCode</extraarg> -->
 										<!-- Turns on the equals plugin -->
 										<!-- <extraarg>-xjc-Xequals</extraarg> -->
-										<extraarg>-xjc-Xhyperjaxb3-jpa2</extraarg>
+										<extraarg>-xjc-Xhyperjaxb3-ejb</extraarg>
 									</extraargs>
 								</wsdlOption>
 							</wsdlOptions>

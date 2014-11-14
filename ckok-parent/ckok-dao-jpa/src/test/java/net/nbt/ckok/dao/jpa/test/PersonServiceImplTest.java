@@ -14,6 +14,7 @@ import javax.persistence.Persistence;
 
 import net.nbt.ckok.dao.jpa.impl.ProductDAOImpl;
 import net.nbt.ckok.model.Product;
+import net.nbt.ckok.model.ProductType;
 
 import org.apache.derby.jdbc.EmbeddedDataSource;
 import org.junit.Test;
@@ -41,7 +42,13 @@ public class PersonServiceImplTest {
         personService.setEntityManager(em);
         em.getTransaction().begin();
         //personService.deleteAll();
+        ProductType pt = new ProductType();
+
+        pt.setMeasure("count");
+        pt.setPartnum("NBT-001");
+        pt.setName("NOMEN");
         Product p = new Product();
+        p.setProductType(pt);
         personService.add(p);
         em.getTransaction().commit();
 //        List<Person> persons = personService.getAll();

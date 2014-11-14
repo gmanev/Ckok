@@ -9,5 +9,13 @@
   	<module>ckok-model</module>
    	<module>ckok-dao-jpa</module>
   	<module>ckok-ui-vaadin</module>
+  	<module>ckok-server</module>
+  	<module>ckok-proxy</module>
   </modules>
+
+    <properties>
+        <cxf.version>2.7.10</cxf.version>
+        <log4j-version>1.2.16</log4j-version>
+        <slf4j-version>1.6.1</slf4j-version>
+    </properties>  
 </project>

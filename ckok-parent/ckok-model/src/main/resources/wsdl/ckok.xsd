@@ -7,11 +7,12 @@
 
     <xsd:complexType name="Product">
         <xsd:sequence>
-            <xsd:element name="id" type="xsd:int" minOccurs="0"/>
-            <xsd:element name="quantity" type="xsd:int" minOccurs="0"/>
-            <xsd:element name="serial" type="xsd:string" minOccurs="0"/>
-            <xsd:element name="supplier" type="xsd:string"/>            
-            <xsd:element name="notes" type="xsd:string"/>   
+        	<xsd:element name="id" type="xsd:int" minOccurs="0" />
+        	<xsd:element name="quantity" type="xsd:int" minOccurs="0" />
+        	<xsd:element name="serial" type="xsd:string" minOccurs="0" />
+        	<xsd:element name="supplier" type="xsd:string" />
+        	<xsd:element name="notes" type="xsd:string" />
+        	<xsd:element name="productType" type="tns:ProductType"></xsd:element>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -23,4 +24,13 @@
         </xs:restriction>
     </xs:simpleType>
      -->
+
+    <xsd:complexType name="ProductType">
+    	<xsd:sequence>
+    		<xsd:element name="id" type="xsd:int"></xsd:element>
+    		<xsd:element name="name" type="xsd:string"></xsd:element>
+    		<xsd:element name="partnum" type="xsd:string"></xsd:element>
+    		<xsd:element name="measure" type="xsd:string"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
 </xsd:schema>
