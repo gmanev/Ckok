@@ -13,24 +13,53 @@
         	<xsd:element name="supplier" type="xsd:string" />
         	<xsd:element name="notes" type="xsd:string" />
         	<xsd:element name="productType" type="tns:ProductType"></xsd:element>
+        	<xsd:element name="createdOn" type="xsd:date"></xsd:element>
+        	<xsd:element name="warranty" type="xsd:date"></xsd:element>
+        	<xsd:element name="last" type="xsd:int"></xsd:element>
         </xsd:sequence>
     </xsd:complexType>
-
-    <!-- 
+<!--
     <xs:simpleType name="customerType">
         <xs:restriction base="xs:string">
             <xs:enumeration value="PRIVATE" />
             <xs:enumeration value="BUSINESS" />
         </xs:restriction>
     </xs:simpleType>
-     -->
-
+  -->
     <xsd:complexType name="ProductType">
     	<xsd:sequence>
     		<xsd:element name="id" type="xsd:int"></xsd:element>
     		<xsd:element name="name" type="xsd:string"></xsd:element>
     		<xsd:element name="partnum" type="xsd:string"></xsd:element>
     		<xsd:element name="measure" type="xsd:string"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="Customer">
+    	<xsd:sequence>
+    		<xsd:element name="customerId" type="xsd:int"></xsd:element>
+    		<xsd:element name="name" type="xsd:string"></xsd:element>
+    		<xsd:element name="notes" type="xsd:string"></xsd:element>
+    		<xsd:element name="createdOn" type="xsd:date"></xsd:element>
+    		<xsd:element name="mailEnable" type="xsd:string"></xsd:element>
+    		<xsd:element name="mailTo" type="xsd:string"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="Operation">
+    	<xsd:sequence>
+    		<xsd:element name="id" type="xsd:int"></xsd:element>
+    		<xsd:element name="customer" type="tns:Customer"></xsd:element>
+    		<xsd:element name="optype" type="xsd:int"></xsd:element>
+    		<xsd:element name="n" type="xsd:int"></xsd:element>
+    		<xsd:element name="ts" type="xsd:date"></xsd:element>
+    		<xsd:element name="ts2" type="xsd:date"></xsd:element>
+    		<xsd:element name="priel" type="xsd:string"></xsd:element>
+    		<xsd:element name="predal" type="xsd:string"></xsd:element>
+    		<xsd:element name="notes" type="xsd:string"></xsd:element>
+    		<xsd:element name="service" type="xsd:string"></xsd:element>
+    		<xsd:element name="facType" type="xsd:int"></xsd:element>
+    		<xsd:element name="facNum" type="xsd:string"></xsd:element>
     	</xsd:sequence>
     </xsd:complexType>
 </xsd:schema>

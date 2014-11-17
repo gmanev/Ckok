@@ -9,6 +9,18 @@
 
 			<xsd:import schemaLocation="ckok.xsd" namespace="http://ckok.nbt.net/model" />
 
+			<xsd:element name="getProductsCount" type="tns:getProductsCount" />
+			<xsd:complexType name="getProductsCount">
+				<xsd:sequence>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:element name="getProductsCountResponse" type="tns:getProductsCountResponse" />
+			<xsd:complexType name="getProductsCountResponse">
+				<xsd:sequence>
+					<xsd:element minOccurs="0" name="count" type="xsd:int" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<!-- ... -->
 			<xsd:element name="getProductById" type="tns:getProductById" />
 			<xsd:complexType name="getProductById">
 				<xsd:sequence>
@@ -59,9 +71,37 @@
 					<xsd:element name="productId" nillable="true" type="xsd:int" />
 				</xsd:sequence>
 			</xsd:complexType>
+			<!-- ... -->
+			<xsd:element name="getProducts" type="tns:getProducts" />
+			<xsd:complexType name="getProducts">
+				<xsd:sequence>
+					<xsd:element minOccurs="0" name="startIndex" type="xsd:int" />
+					<xsd:element minOccurs="0" name="count" type="xsd:int" />
+					<xsd:element minOccurs="0" name="criteria" type="xsd:string" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:element name="getProductsResponse" type="tns:getProductsResponse" />
+			<xsd:complexType name="getProductsResponse">
+				<xsd:sequence>
+					<xsd:element minOccurs="0" maxOccurs="unbounded" name="return" type="cns:Product" />
+				</xsd:sequence>
+			</xsd:complexType>
+
 		</xsd:schema>
 	</wsdl:types>
 
+	<wsdl:message name="getProductsCount">
+		<wsdl:part name="parameters" element="tns:getProductsCount" />
+	</wsdl:message>
+	<wsdl:message name="getProductsCountResponse">
+		<wsdl:part name="parameters" element="tns:getProductsCountResponse" />
+	</wsdl:message>
+	<wsdl:message name="getProducts">
+		<wsdl:part name="parameters" element="tns:getProducts" />
+	</wsdl:message>
+	<wsdl:message name="getProductsResponse">
+		<wsdl:part name="parameters" element="tns:getProductsResponse" />
+	</wsdl:message>
 	<wsdl:message name="getProductById">
 		<wsdl:part name="parameters" element="tns:getProductById" />
 	</wsdl:message>
@@ -105,7 +145,14 @@
 			<wsdl:input name="getAllProducts" message="tns:getAllProducts" />
 			<wsdl:output name="getAllProductsResponse" message="tns:getAllProductsResponse" />
 		</wsdl:operation>
-
+		<wsdl:operation name="getProductsCount">
+			<wsdl:input name="getProductsCount" message="tns:getProductsCount" />
+			<wsdl:output name="getProductsCountResponse" message="tns:getProductsCountResponse" />
+		</wsdl:operation>
+		<wsdl:operation name="getProducts">
+			<wsdl:input name="getProducts" message="tns:getProducts" />
+			<wsdl:output name="getProductsResponse" message="tns:getProductsResponse" />
+		</wsdl:operation>
 	</wsdl:portType>
 
 	<wsdl:binding name="CkokServiceServiceSoapBinding" type="tns:CkokService">
@@ -149,6 +196,25 @@
 				<soap:body use="literal" />
 			</wsdl:input>
 			<wsdl:output name="getAllProductsResponse">
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="getProductsCount">
+			<soap:operation soapAction="" style="document" />
+			<wsdl:input name="getProductsCount">
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="getProductsCountResponse">
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>			
+		<wsdl:operation name="getProducts">
+			<soap:operation soapAction="" style="document" />
+			<wsdl:input name="getProducts">
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="getProductsResponse">
 				<soap:body use="literal" />
 			</wsdl:output>
 		</wsdl:operation>

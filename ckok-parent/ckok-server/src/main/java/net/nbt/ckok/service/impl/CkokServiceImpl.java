@@ -1,7 +1,5 @@
 package net.nbt.ckok.service.impl;
 
-import java.util.Collections;
-
 import net.nbt.ckok.model.dao.ProductDAO;
 import net.nbt.ckok.service.CkokService;
 import net.nbt.ckok.service.DeleteProductById;
@@ -9,6 +7,10 @@ import net.nbt.ckok.service.GetAllProducts;
 import net.nbt.ckok.service.GetAllProductsResponse;
 import net.nbt.ckok.service.GetProductById;
 import net.nbt.ckok.service.GetProductByIdResponse;
+import net.nbt.ckok.service.GetProducts;
+import net.nbt.ckok.service.GetProductsCount;
+import net.nbt.ckok.service.GetProductsCountResponse;
+import net.nbt.ckok.service.GetProductsResponse;
 import net.nbt.ckok.service.NoSuchProductException;
 import net.nbt.ckok.service.UpdateProduct;
 import net.nbt.ckok.service.UpdateProductResponse;
@@ -43,6 +45,18 @@ public class CkokServiceImpl implements CkokService {
 		GetAllProductsResponse response = new GetAllProductsResponse();
 		response.setReturn(productDAO.getAll());
 		return response;
+	}
+
+	public GetProductsCountResponse getProductsCount(GetProductsCount parameters) {
+		GetProductsCountResponse r = new GetProductsCountResponse();
+		r.setCount(productDAO.count());
+		return r;
+	}
+
+	public GetProductsResponse getProducts(GetProducts parameters) {
+		GetProductsResponse r = new GetProductsResponse();
+		r.setReturn(productDAO.get(parameters.getStartIndex(), parameters.getCount(), parameters.getCriteria()));
+		return r;
 	}
 
 }
