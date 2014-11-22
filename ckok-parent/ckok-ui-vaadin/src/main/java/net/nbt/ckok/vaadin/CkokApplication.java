@@ -85,7 +85,7 @@ class CkokApplication extends Application {
 		container.addContainerProperty("supplier", String.class, "", true, true);
 		container.addContainerProperty("notes", String.class, "", true, true);
 		container.addContainerProperty("createdOn", Date.class, "", true, true);
-		container.addContainerProperty("warranty", Date.class, "", true, true);		
+		container.addContainerProperty("warranty", Date.class, "", true, true);
 		table.setContainerDataSource(container);
 
 		//MenuBar menu = createMenuBar(beans, table);
@@ -97,11 +97,16 @@ class CkokApplication extends Application {
 		table.addListener(new Property.ValueChangeListener() {
 			public void valueChange(ValueChangeEvent event) {
 				Object selectedId = table.getValue();
+				if (selectedId == null) {
+					return;
+				}
 				@SuppressWarnings("unchecked")
 				BeanItem<Product> item = (BeanItem<Product>) table
 						.getItem(selectedId);
+
 				form.setItemDataSource(item);
 				form.setVisibleItemProperties(VISIBLE_COLUMNS);
+
 			}
 		});
 		//update(beans);
