@@ -121,6 +121,7 @@ class CkokApplication extends Application {
 		form.setCaption("Edit Task");
 		form.setVisibleItemProperties(VISIBLE_COLUMNS);
 		form.setImmediate(true);
+		/*
 		form.setFormFieldFactory(new DefaultFieldFactory() {
 			@Override
 			public Field createField(Item item, Object propertyId,
@@ -142,7 +143,7 @@ class CkokApplication extends Application {
 
 				return field;
 			}
-		});
+		});*/
 
 		// Filter table according to typed input
 		tf.addListener(new TextChangeListener() {

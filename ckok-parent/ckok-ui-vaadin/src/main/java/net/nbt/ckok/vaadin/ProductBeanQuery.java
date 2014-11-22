@@ -13,6 +13,8 @@ import org.vaadin.addons.lazyquerycontainer.QueryDefinition;
 
 public class ProductBeanQuery extends AbstractBeanQuery<Product> {
 
+	private int size = -1;
+	
 	public ProductBeanQuery(QueryDefinition definition,
 			Map<String, Object> queryConfiguration, Object[] sortPropertyIds,
 			boolean[] sortStates) {
@@ -48,9 +50,12 @@ public class ProductBeanQuery extends AbstractBeanQuery<Product> {
 
 	@Override
 	public int size() {
-		CkokService service =
-				(CkokService)getQueryConfiguration().get("service");		
-		return service.getProductsCount(new GetProductsCount()).getCount();
+		if (size == -1) {
+			CkokService service =
+					(CkokService)getQueryConfiguration().get("service");		
+			size = service.getProductsCount(new GetProductsCount()).getCount();
+		}
+		return size; 
 	}
 
 }
