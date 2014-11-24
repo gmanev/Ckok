@@ -55,7 +55,7 @@ public class CkokServiceImpl implements CkokService {
 
 	public GetProductsResponse getProducts(GetProducts parameters) {
 		GetProductsResponse r = new GetProductsResponse();
-		r.setReturn(productDAO.get(parameters.getStartIndex(), parameters.getCount(), parameters.getCriteria()));
+		r.setReturn(productDAO.get(parameters.getStartIndex(), parameters.getCount(), parameters.getSort()));
 		return r;
 	}
 

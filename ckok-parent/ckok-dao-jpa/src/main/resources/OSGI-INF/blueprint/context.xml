@@ -11,15 +11,15 @@
 			http://aries.apache.org/xmlns/jpa/v1.0.0 http://aries.apache.org/xmlns/jpa/v1.0.0 
 			http://aries.apache.org/xmlns/transactions/v1.0.0 http://aries.apache.org/xmlns/transactions/v1.0.0">
 
-  <bean id="productDAO" class="net.nbt.ckok.dao.jpa.impl.ProductDAOImpl"> 
-      <jpa:context unitname="ckok" property="entityManager"/>
-      <tx:transaction method="*" value="Required"/>
-  </bean>
-  
+	<bean id="productDAO" class="net.nbt.ckok.dao.jpa.impl.ProductDAOImpl">
+		<jpa:context unitname="ckok" property="entityManager" />
+		<tx:transaction method="*" value="Required" />
+	</bean>
+
 	<service ref="productDAO" interface="net.nbt.ckok.model.dao.ProductDAO">
 		<service-properties>
 			<!-- This property is only important for the DOSGi tutorial -->
-			<entry key="service.exported.interfaces" value="*"/>
+			<entry key="service.exported.interfaces" value="*" />
 		</service-properties>
 	</service>
 
