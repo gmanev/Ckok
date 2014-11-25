@@ -8,26 +8,20 @@ import java.util.Map;
 import net.nbt.ckok.model.Product;
 import net.nbt.ckok.service.CkokService;
 import net.nbt.ckok.service.GetAllProducts;
-import net.nbt.ckok.service.UpdateProduct;
 
 import org.apache.log4j.Logger;
 import org.vaadin.addons.lazyquerycontainer.BeanQueryFactory;
-import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
 
 import com.vaadin.Application;
 import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
-import com.vaadin.ui.AbstractField;
-import com.vaadin.ui.DefaultFieldFactory;
-import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.MenuBar;
@@ -64,7 +58,7 @@ class CkokApplication extends Application {
 		//beans.setBeanIdProperty("id");
 
 		// Text field for inputting a filter
-		final TextField tf = new TextField("Name Filter");
+		final TextField tf = new TextField("Search");
 		tf.focus();
 		layout.addComponent(tf);
 
@@ -78,9 +72,11 @@ class CkokApplication extends Application {
 
 		final Form form = new Form();
 		form.setLocale(Locale.ENGLISH);
-		final Table table = new Table(this.title);
+		final Table table = new Table();
 		
-		LazyQueryContainer container = new LazyQueryContainer(queryFactory, false, 10);
+		QuickSearchQueryDefinition fqd = new QuickSearchQueryDefinition();
+		fqd.setBatchSize(10);
+		FilterableLazyQueryContainer container = new FilterableLazyQueryContainer(fqd, queryFactory);
 		container.addContainerProperty("serial", String.class, "", true, true);
 		container.addContainerProperty("supplier", String.class, "", true, true);
 		container.addContainerProperty("notes", String.class, "", true, true);
@@ -155,12 +151,10 @@ class CkokApplication extends Application {
 				// Remove old filter
 				if (filter != null)
 					f.removeContainerFilter(filter);
-
-				log.info(event.getText());
 				
 				// Set new filter for the "Name" column
 				filter = new SimpleStringFilter("serial", event.getText(), true,
-						false);
+						true);
 				f.addContainerFilter(filter);
 			}
 		});

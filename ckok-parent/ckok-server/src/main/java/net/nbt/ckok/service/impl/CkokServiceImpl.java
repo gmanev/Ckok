@@ -49,13 +49,13 @@ public class CkokServiceImpl implements CkokService {
 
 	public GetProductsCountResponse getProductsCount(GetProductsCount parameters) {
 		GetProductsCountResponse r = new GetProductsCountResponse();
-		r.setCount(productDAO.count());
+		r.setCount(productDAO.count(parameters.getFilters()));
 		return r;
 	}
 
 	public GetProductsResponse getProducts(GetProducts parameters) {
 		GetProductsResponse r = new GetProductsResponse();
-		r.setReturn(productDAO.get(parameters.getStartIndex(), parameters.getCount(), parameters.getSort()));
+		r.setReturn(productDAO.get(parameters.getStartIndex(), parameters.getCount(), parameters.getFilters(), parameters.getSort()));
 		return r;
 	}
 

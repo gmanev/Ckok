@@ -3,6 +3,7 @@ package net.nbt.ckok.model.dao;
 import java.util.List;
 
 import net.nbt.ckok.service.OrderBy;
+import net.nbt.ckok.service.QueryFilters;
 
 public interface GenericDAO<T> {
 
@@ -12,5 +13,7 @@ public interface GenericDAO<T> {
 	public List<T> getAll();
 	public T find(int productId);
 	public int count();
-	public List<T> get(int startIndex, int count, List<OrderBy> sort);
+	public int count(QueryFilters queryFilters);	
+	public List<T> get(int startIndex, int count, QueryFilters queryFilters, List<OrderBy> sort);
+
 }

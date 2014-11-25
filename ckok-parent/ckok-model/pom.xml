@@ -41,7 +41,7 @@
 			<artifactId>log4j</artifactId>
 			<version>${log4j-version}</version>
 		</dependency>
-		
+
 	</dependencies>
 
 
@@ -119,6 +119,11 @@
 				<dependencies>
 					<dependency>
 						<groupId>org.jvnet.jaxb2_commons</groupId>
+						<artifactId>jaxb2-value-constructor</artifactId>
+						<version>3.0</version>
+					</dependency>
+					<dependency>
+						<groupId>org.jvnet.jaxb2_commons</groupId>
 						<artifactId>jaxb2-basics</artifactId>
 						<version>0.9.1</version>
 					</dependency>
@@ -143,6 +148,7 @@
 										<bindingFile>${project.basedir}/src/main/resources/wsdl/binding.xjb</bindingFile>
 									</bindingFiles>
 									<extraargs>
+										<extraarg>-xjc-Xvalue-constructor</extraarg>
 										<!-- Turns on the hashCode plugin -->
 										<!-- <extraarg>-xjc-XhashCode</extraarg> -->
 										<!-- Turns on the equals plugin -->
