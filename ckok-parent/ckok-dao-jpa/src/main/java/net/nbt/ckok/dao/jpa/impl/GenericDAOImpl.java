@@ -12,9 +12,9 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import net.nbt.ckok.model.dao.GenericDAO;
+import net.nbt.ckok.service.MatchAnyFilter;
 import net.nbt.ckok.service.OrderBy;
 import net.nbt.ckok.service.QueryFilter;
-import net.nbt.ckok.service.QueryFilters;
 import net.nbt.ckok.service.StringFilter;
 
 public class GenericDAOImpl<T> implements GenericDAO<T> {
@@ -67,41 +67,41 @@ public class GenericDAOImpl<T> implements GenericDAO<T> {
         return count.intValue();
 	}
 
-	private List<Predicate> asPredicates(CriteriaBuilder cb, Root<T> from, QueryFilters queryFilters) {
-		List<Predicate> predicates = new ArrayList<Predicate>();
-		for (QueryFilter queryFilter : queryFilters.getMatchAll()) {
-			StringFilter filter = (StringFilter) queryFilter;
-			Expression<String> ex = from.get(filter.getAttributeName()).as(String.class);
-			if (filter.isOnlyMatchPrefix()) {
-				predicates.add(
-						filter.isIgnoreCase() ?
-								cb.like(cb.lower(ex), String.format("%%%s%%", filter.getFilterString().toLowerCase())) :
-								cb.like(ex, String.format("%%%s%%", filter.getFilterString())));
+	private Predicate createFrom(CriteriaBuilder cb, Root<T> from, QueryFilter filter) {
+		if (filter instanceof MatchAnyFilter) {
+			List<Predicate> predicates = new ArrayList<Predicate>();
+			for (QueryFilter f : ((MatchAnyFilter) filter).getFilters()) {
+				predicates.add(createFrom(cb, from, f));
+			}
+			return cb.or(predicates.toArray(new Predicate[]{}));
+		}
+		else if (filter instanceof StringFilter) {
+			StringFilter stringFilter = (StringFilter) filter;
+			Expression<String> ex = from.get(stringFilter.getAttributeName()).as(String.class);
+			if (stringFilter.isOnlyMatchPrefix()) {
+				return stringFilter.isIgnoreCase() ?
+						cb.like(cb.lower(ex), "%" + stringFilter.getFilterString().toLowerCase() + "%") :
+						cb.like(ex, "%" + stringFilter.getFilterString() + "%");
 			}
 			else {
-				predicates.add(
-						filter.isIgnoreCase() ?
-								cb.equal(cb.lower(ex), filter.getFilterString().toLowerCase()) :
-								cb.equal(ex, filter.getFilterString()));
+				return stringFilter.isIgnoreCase() ?
+						cb.equal(cb.lower(ex), stringFilter.getFilterString().toLowerCase()) :
+						cb.equal(ex, stringFilter.getFilterString());
 			}
 		}
-	    return predicates;
+		// everything else
+		return null;
 	}
 
-	private Predicate asPredicate(CriteriaBuilder cb, Root<T> from, QueryFilters queryFilters) {
-		List<Predicate> predicates = asPredicates(cb, from, queryFilters);
-		return cb.and(predicates.toArray(new Predicate[]{}));
-	}
-	
 	@Override
-	public List<T> get(int startIndex, int count, QueryFilters queryFilters, List<OrderBy> sort) {
+	public List<T> get(int startIndex, int count, QueryFilter filter, List<OrderBy> sort) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<T> q = cb.createQuery(cl);
 
 		Root<T> from = q.from(cl);
 		CriteriaQuery<T> select = q.select(from);
 
-		select.where(asPredicate(cb, from, queryFilters));
+		select.where(createFrom(cb, from, filter));
 		
 		for (OrderBy o : sort) {
 			if (o.isAscending()) {
@@ -121,12 +121,12 @@ public class GenericDAOImpl<T> implements GenericDAO<T> {
 	}
 
 	@Override
-	public int count(QueryFilters queryFilters) {
+	public int count(QueryFilter filter) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
 		
 		Root<T> from = countQuery.from(cl);
-		countQuery.select(cb.count(from)).where(asPredicate(cb, from, queryFilters));
+		countQuery.select(cb.count(from)).where(createFrom(cb, from, filter));
 		Long count = em.createQuery(countQuery).getSingleResult();		
         return count.intValue();
 	}

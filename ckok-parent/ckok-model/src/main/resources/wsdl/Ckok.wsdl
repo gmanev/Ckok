@@ -17,12 +17,6 @@
 			</xsd:complexType>
 
 			<xsd:complexType name="queryFilter"></xsd:complexType>
-			<xsd:complexType name="queryFilters">
-				<xsd:sequence>
-					<xsd:element minOccurs="0" maxOccurs="unbounded" name="matchAny" type="tns:queryFilter" />
-					<xsd:element minOccurs="0" maxOccurs="unbounded" name="matchAll" type="tns:queryFilter" />					
-				</xsd:sequence>
-			</xsd:complexType>
 
 			<xsd:complexType name="stringFilter">
 				<xsd:complexContent>
@@ -37,10 +31,30 @@
 				</xsd:complexContent>
 			</xsd:complexType>
 
+			<xsd:complexType name="matchAnyFilter">
+				<xsd:complexContent>
+					<xsd:extension base="tns:queryFilter">
+						<xsd:sequence>
+							<xsd:element minOccurs="0"  maxOccurs="unbounded" name="filters" type="tns:queryFilter" />
+						</xsd:sequence>
+					</xsd:extension>
+				</xsd:complexContent>
+			</xsd:complexType>
+
+			<xsd:complexType name="matchAllFilter">
+				<xsd:complexContent>
+					<xsd:extension base="tns:queryFilter">
+						<xsd:sequence>
+							<xsd:element minOccurs="0"  maxOccurs="unbounded" name="filters" type="tns:queryFilter" />
+						</xsd:sequence>
+					</xsd:extension>
+				</xsd:complexContent>
+			</xsd:complexType>
+
 			<xsd:element name="getProductsCount" type="tns:getProductsCount" />
 			<xsd:complexType name="getProductsCount">
 				<xsd:sequence>
-					<xsd:element minOccurs="0" name="filters" type="tns:queryFilters" />
+					<xsd:element minOccurs="0" name="filter" type="tns:queryFilter" />
 				</xsd:sequence>
 			</xsd:complexType>
 			<xsd:element name="getProductsCountResponse" type="tns:getProductsCountResponse" />
@@ -107,9 +121,8 @@
 				<xsd:sequence>
 					<xsd:element minOccurs="0" name="startIndex" type="xsd:int" />
 					<xsd:element minOccurs="0" name="count" type="xsd:int" />
-					<xsd:element minOccurs="0" name="filters" type="tns:queryFilters" />
-					<xsd:element minOccurs="0" maxOccurs="unbounded" name="sort"
-						type="tns:orderBy" />
+					<xsd:element minOccurs="0" name="filter" type="tns:queryFilter" />
+					<xsd:element minOccurs="0" maxOccurs="unbounded" name="sort" type="tns:orderBy" />
 				</xsd:sequence>
 			</xsd:complexType>
 			<xsd:element name="getProductsResponse" type="tns:getProductsResponse" />

@@ -9,8 +9,7 @@ import net.nbt.ckok.service.CkokService;
 import net.nbt.ckok.service.GetProducts;
 import net.nbt.ckok.service.GetProductsCount;
 import net.nbt.ckok.service.OrderBy;
-import net.nbt.ckok.service.QueryFilters;
-import net.nbt.ckok.service.StringFilter;
+import net.nbt.ckok.service.QueryFilter;
 
 import org.vaadin.addons.lazyquerycontainer.AbstractBeanQuery;
 import org.vaadin.addons.lazyquerycontainer.QueryDefinition;
@@ -19,6 +18,7 @@ public class ProductBeanQuery extends AbstractBeanQuery<Product> {
 
 	private int size = -1;
 	private List<OrderBy> sort = new ArrayList<OrderBy>();
+	private final QueryFilter filter;
 	
 	public ProductBeanQuery(QueryDefinition definition,
 			Map<String, Object> queryConfiguration, Object[] sortPropertyIds,
@@ -31,6 +31,8 @@ public class ProductBeanQuery extends AbstractBeanQuery<Product> {
 			orderBy.setAscending(sortStates[i]);
 			sort.add(orderBy);
 		}
+		
+		filter = ((QuickSearchQueryDefinition) definition).getQueryFilter();
 	}
 	
 	@Override
@@ -42,18 +44,8 @@ public class ProductBeanQuery extends AbstractBeanQuery<Product> {
 	protected List<Product> loadBeans(int startIndex, int count) {
 		CkokService service =
 				(CkokService)getQueryConfiguration().get("service");		
-		GetProducts parameters = new GetProducts();
-		parameters.setStartIndex(startIndex);
-		parameters.setCount(count);
-		parameters.setSort(sort);
-		parameters.setFilters(new QueryFilters());
-		parameters.getFilters().getMatchAll().add(new StringFilter("serial", "F", false, true));
-
-/*
-		List<Product> items = new ArrayList<Product>();
-		for (Product product : service.getProducts(parameters).getReturn()) {
-			items.add(new BeanItem<Product>(product));
-		}*/
+		GetProducts parameters = 
+				new GetProducts(startIndex, count, filter, sort);
 		return service.getProducts(parameters).getReturn();
 	}
 
@@ -68,8 +60,7 @@ public class ProductBeanQuery extends AbstractBeanQuery<Product> {
 		if (size == -1) {
 			CkokService service =
 					(CkokService)getQueryConfiguration().get("service");
-			GetProductsCount request = new GetProductsCount(new QueryFilters());
-			request.getFilters().getMatchAll().add(new StringFilter("serial", "F", false, true));
+			GetProductsCount request = new GetProductsCount(filter);
 			size = service.getProductsCount(request).getCount();
 		}
 		return size; 
