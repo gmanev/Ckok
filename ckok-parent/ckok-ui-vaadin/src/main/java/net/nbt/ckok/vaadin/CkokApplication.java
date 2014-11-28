@@ -2,59 +2,49 @@ package net.nbt.ckok.vaadin;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import net.nbt.ckok.model.Product;
-import net.nbt.ckok.model.ProductType;
 import net.nbt.ckok.service.CkokService;
 import net.nbt.ckok.service.GetAllProducts;
 
-import org.apache.log4j.Logger;
 import org.vaadin.addons.lazyquerycontainer.BeanQueryFactory;
+import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
 
-import com.vaadin.Application;
+import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.Filterable;
-import com.vaadin.data.Item;
-import com.vaadin.data.Property;
-import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.util.BeanContainer;
-import com.vaadin.data.util.BeanItem;
-import com.vaadin.data.util.filter.Or;
-import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
-import com.vaadin.ui.Form;
+import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.Window;
+import com.vaadin.ui.UI;
 
 @SuppressWarnings("serial")
-class CkokApplication extends Application {
+@PreserveOnRefresh
+public class CkokApplication extends UI {
 
-	private static final Object[] VISIBLE_COLUMNS = new Object[] { "productType", "serial",
+	private static final Object[] VISIBLE_COLUMNS = new Object[] { "serial",
 			"supplier", "notes", "createdOn", "warranty" };
 	private final String title;
 	private CkokService service;
-
-	private final Logger log = Logger.getLogger(CkokApplication.class);
-
+	
 	CkokApplication(CkokService service, String title) {
 		this.service = service;
 		this.title = title;
 	}
 
 	@Override
-	public void init() {
+	public void init(VaadinRequest request) {
 		final GridLayout layout = new GridLayout(1, 3);
 		layout.setWidth("100%");
 		layout.setMargin(false);
-		setMainWindow(new Window(this.title, layout));
 
 		//final BeanContainer<String, Product> beans = new BeanContainer<String, Product>(
 		//		Product.class);
@@ -73,25 +63,24 @@ class CkokApplication extends Application {
 		queryConfiguration.put("service", service);
 		queryFactory.setQueryConfiguration(queryConfiguration);
 
-		final Form form = new Form();
-		form.setLocale(Locale.ENGLISH);
+//		final Form form = new Form();
+//		form.setLocale(Locale.ENGLISH);
 		final Table table = new Table();
-		
-		QuickSearchQueryDefinition fqd = new QuickSearchQueryDefinition();
-		fqd.setBatchSize(10);
 
-		FilterableLazyQueryContainer container = new FilterableLazyQueryContainer(fqd, queryFactory);
-		container.addContainerProperty("productType", ProductType.class, "", true, true);
-		container.addContainerProperty("serial", String.class, "", true, true);
+		final LazyQueryContainer container = new LazyQueryContainer(queryFactory, "id", 50, false);
+		container.addContainerProperty("productType.name", String.class, "", true, true);
+		container.addContainerProperty("productType.partnum", String.class, "", true, true);
+		container.addContainerProperty("serial", String.class, "", true, true);		
 		container.addContainerProperty("supplier", String.class, "", true, true);
 		container.addContainerProperty("notes", String.class, "", true, true);
 		container.addContainerProperty("createdOn", Date.class, "", true, true);
 		container.addContainerProperty("warranty", Date.class, "", true, true);
 		table.setContainerDataSource(container);
+		container.getQueryView().getQueryDefinition().setMaxNestedPropertyDepth(2);
 
 		//MenuBar menu = createMenuBar(beans, table);
 		//layout.addComponent(menu);
-
+/*
 		table.setSelectable(true);
 		table.setImmediate(true);
 		table.setVisibleColumns(VISIBLE_COLUMNS);
@@ -110,9 +99,11 @@ class CkokApplication extends Application {
 
 			}
 		});
+*/		
 		//update(beans);
 		layout.addComponent(table);
 
+		/*
 		if (table.getItemIds().iterator().hasNext()) {
 			Object first = table.getItemIds().iterator().next();
 			Item item = table.getItem(first);
@@ -122,6 +113,7 @@ class CkokApplication extends Application {
 		form.setCaption("Edit Task");
 		form.setVisibleItemProperties(VISIBLE_COLUMNS);
 		form.setImmediate(true);
+		*/
 		/*
 		form.setFormFieldFactory(new DefaultFieldFactory() {
 			@Override
@@ -147,7 +139,7 @@ class CkokApplication extends Application {
 		});*/
 
 		// Filter table according to typed input
-		tf.addListener(new TextChangeListener() {
+		tf.addTextChangeListener(new TextChangeListener() {
 			Filter filter = null;
 
 			public void textChange(TextChangeEvent event) {
@@ -157,12 +149,10 @@ class CkokApplication extends Application {
 				if (filter != null)
 					f.removeContainerFilter(filter);
 
-				filter = new Or(
-							new SimpleStringFilter("serial", event.getText(), true,	true),
-							new SimpleStringFilter("notes", event.getText(), true,	true),
-							new SimpleStringFilter("supplier", event.getText(), true, true)							
-						);
+				filter = new QuickSearchFilter(event.getText());
+				
 				f.addContainerFilter(filter);
+				container.refresh();
 			}
 		});
 
@@ -174,7 +164,8 @@ class CkokApplication extends Application {
 		 * (BeanItem<Product>) form.getItemDataSource();
 		 * productDAO.update(item.getBean()); } });
 		 */
-		layout.addComponent(form);
+
+		setContent(layout);
 	}
 
 	private MenuBar createMenuBar(final BeanContainer<String, Product> beans,

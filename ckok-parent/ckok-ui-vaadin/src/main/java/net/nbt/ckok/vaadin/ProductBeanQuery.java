@@ -1,15 +1,13 @@
 package net.nbt.ckok.vaadin;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import net.nbt.ckok.model.Product;
 import net.nbt.ckok.service.CkokService;
-import net.nbt.ckok.service.GetProducts;
-import net.nbt.ckok.service.GetProductsCount;
 import net.nbt.ckok.service.OrderBy;
-import net.nbt.ckok.service.QueryFilter;
+import net.nbt.ckok.service.ProductsQuickSearch;
+import net.nbt.ckok.service.ProductsQuickSearchCount;
 
 import org.vaadin.addons.lazyquerycontainer.AbstractBeanQuery;
 import org.vaadin.addons.lazyquerycontainer.QueryDefinition;
@@ -17,22 +15,26 @@ import org.vaadin.addons.lazyquerycontainer.QueryDefinition;
 public class ProductBeanQuery extends AbstractBeanQuery<Product> {
 
 	private int size = -1;
-	private List<OrderBy> sort = new ArrayList<OrderBy>();
-	private final QueryFilter filter;
+	private OrderBy orderBy = null;
+	private String searchString = "";
 	
 	public ProductBeanQuery(QueryDefinition definition,
 			Map<String, Object> queryConfiguration, Object[] sortPropertyIds,
 			boolean[] sortStates) {
 		super(definition, queryConfiguration, sortPropertyIds, sortStates);
 
-		for (int i = 0; i < sortPropertyIds.length; i++) {
-			OrderBy orderBy = new OrderBy();
+		if (sortPropertyIds != null)
+		for (int i = 0; i < sortPropertyIds.length;) {
+			orderBy = new OrderBy();
 			orderBy.setAttributeName(sortPropertyIds[i].toString());
 			orderBy.setAscending(sortStates[i]);
-			sort.add(orderBy);
+			break;
 		}
 		
-		filter = ((QuickSearchQueryDefinition) definition).getQueryFilter();
+		if (definition.getFilters().size() > 0) {
+			QuickSearchFilter filter = (QuickSearchFilter) definition.getFilters().get(0);
+			searchString = filter.getSearchString();
+		}
 	}
 	
 	@Override
@@ -44,9 +46,13 @@ public class ProductBeanQuery extends AbstractBeanQuery<Product> {
 	protected List<Product> loadBeans(int startIndex, int count) {
 		CkokService service =
 				(CkokService)getQueryConfiguration().get("service");		
-		GetProducts parameters = 
-				new GetProducts(startIndex, count, filter, sort);
-		return service.getProducts(parameters).getReturn();
+		ProductsQuickSearch parameters = 
+				new ProductsQuickSearch(
+						startIndex,
+						count,
+						searchString,
+						orderBy);
+		return service.productsQuickSearch(parameters).getReturn();
 	}
 
 	@Override
@@ -58,10 +64,9 @@ public class ProductBeanQuery extends AbstractBeanQuery<Product> {
 	@Override
 	public int size() {
 		if (size == -1) {
-			CkokService service =
-					(CkokService)getQueryConfiguration().get("service");
-			GetProductsCount request = new GetProductsCount(filter);
-			size = service.getProductsCount(request).getCount();
+			CkokService service = (CkokService)getQueryConfiguration().get("service");
+			ProductsQuickSearchCount request = new ProductsQuickSearchCount(searchString);
+			size = service.productsQuickSearchCount(request).getCount();
 		}
 		return size; 
 	}

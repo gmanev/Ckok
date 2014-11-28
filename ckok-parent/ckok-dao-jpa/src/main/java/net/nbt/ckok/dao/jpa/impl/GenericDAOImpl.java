@@ -19,7 +19,7 @@ import net.nbt.ckok.service.StringFilter;
 
 public class GenericDAOImpl<T> implements GenericDAO<T> {
 
-    private EntityManager em;
+    protected EntityManager em;
     private Class<T> cl;
     
     public GenericDAOImpl(Class<T> cl) { 
@@ -80,13 +80,13 @@ public class GenericDAOImpl<T> implements GenericDAO<T> {
 			Expression<String> ex = from.get(stringFilter.getAttributeName()).as(String.class);
 			if (stringFilter.isOnlyMatchPrefix()) {
 				return stringFilter.isIgnoreCase() ?
-						cb.like(cb.lower(ex), "%" + stringFilter.getFilterString().toLowerCase() + "%") :
-						cb.like(ex, "%" + stringFilter.getFilterString() + "%");
+						cb.like(cb.lower(ex), stringFilter.getFilterString().toLowerCase() + "%") :
+						cb.like(ex, stringFilter.getFilterString() + "%");
 			}
 			else {
 				return stringFilter.isIgnoreCase() ?
-						cb.equal(cb.lower(ex), stringFilter.getFilterString().toLowerCase()) :
-						cb.equal(ex, stringFilter.getFilterString());
+						cb.like(cb.lower(ex), "%" + stringFilter.getFilterString().toLowerCase() + "%") :
+						cb.like(ex, "%" + stringFilter.getFilterString() + "%");
 			}
 		}
 		// everything else

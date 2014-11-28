@@ -8,10 +8,12 @@ import net.nbt.ckok.service.GetAllProductsResponse;
 import net.nbt.ckok.service.GetProductById;
 import net.nbt.ckok.service.GetProductByIdResponse;
 import net.nbt.ckok.service.GetProducts;
-import net.nbt.ckok.service.GetProductsCount;
-import net.nbt.ckok.service.GetProductsCountResponse;
 import net.nbt.ckok.service.GetProductsResponse;
 import net.nbt.ckok.service.NoSuchProductException;
+import net.nbt.ckok.service.ProductsQuickSearch;
+import net.nbt.ckok.service.ProductsQuickSearchCount;
+import net.nbt.ckok.service.ProductsQuickSearchCountResponse;
+import net.nbt.ckok.service.ProductsQuickSearchResponse;
 import net.nbt.ckok.service.UpdateProduct;
 import net.nbt.ckok.service.UpdateProductResponse;
 
@@ -47,16 +49,28 @@ public class CkokServiceImpl implements CkokService {
 		return response;
 	}
 
-	public GetProductsCountResponse getProductsCount(GetProductsCount parameters) {
-		GetProductsCountResponse r = new GetProductsCountResponse();
-		r.setCount(productDAO.count(parameters.getFilter()));
-		return r;
-	}
-
 	public GetProductsResponse getProducts(GetProducts parameters) {
 		GetProductsResponse r = new GetProductsResponse();
 		r.setReturn(productDAO.get(parameters.getStartIndex(), parameters.getCount(), parameters.getFilter(), parameters.getSort()));
 		return r;
+	}
+
+	public ProductsQuickSearchResponse productsQuickSearch(
+			ProductsQuickSearch parameters) {
+		ProductsQuickSearchResponse response = new ProductsQuickSearchResponse();
+		response.setReturn(productDAO.quickSearch(
+				parameters.getStartIndex(),
+				parameters.getCount(),
+				parameters.getSearchString(),
+				parameters.getOrderBy()));
+		return response;
+	}
+
+	public ProductsQuickSearchCountResponse productsQuickSearchCount(
+			ProductsQuickSearchCount parameters) {
+		ProductsQuickSearchCountResponse response = new ProductsQuickSearchCountResponse();
+		response.setCount(productDAO.quickSearchCount(parameters.getSearchString()));
+		return response;
 	}
 
 }

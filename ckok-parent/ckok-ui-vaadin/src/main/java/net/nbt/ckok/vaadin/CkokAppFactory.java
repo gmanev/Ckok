@@ -3,8 +3,7 @@ package net.nbt.ckok.vaadin;
 import net.nbt.ckok.service.CkokService;
 
 import com.jjinterna.vaadin.vaadinbridge.ApplicationFactory;
-import com.vaadin.Application;
-import com.vaadin.Application.SystemMessages;
+import com.vaadin.ui.UI;
 
 public class CkokAppFactory implements ApplicationFactory {
     
@@ -16,15 +15,13 @@ public class CkokAppFactory implements ApplicationFactory {
         this.title = title;
     }
     
-    public String getApplicationCSSClassName() {
-        return "CKOKApplication";
-    }
+	@Override
+	public Class<? extends UI> getUIClass() {
+		return CkokApplication.class;
+	}
 
-    public SystemMessages getSystemMessages() {
-        return null;
-    }
-
-    public Application newInstance() {
-        return new CkokApplication(service, title);
-    }
+	@Override
+	public UI getInstance() {
+		return new CkokApplication(service, title);
+	}
 }
