@@ -1,198 +1,143 @@
 package net.nbt.ckok.vaadin;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.nbt.ckok.model.Product;
 import net.nbt.ckok.service.CkokService;
-import net.nbt.ckok.service.GetAllProducts;
 
 import org.vaadin.addons.lazyquerycontainer.BeanQueryFactory;
 import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
 
-import com.vaadin.annotations.PreserveOnRefresh;
-import com.vaadin.data.Container.Filter;
-import com.vaadin.data.Container.Filterable;
-import com.vaadin.data.util.BeanContainer;
+import com.vaadin.annotations.Theme;
+import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.server.VaadinRequest;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.MenuBar;
-import com.vaadin.ui.MenuBar.Command;
-import com.vaadin.ui.MenuBar.MenuItem;
+import com.vaadin.ui.AbstractTextField.TextChangeEventMode;
+import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
 
-@SuppressWarnings("serial")
-@PreserveOnRefresh
+@Theme("valo")
 public class CkokApplication extends UI {
 
-	private static final Object[] VISIBLE_COLUMNS = new Object[] { "serial",
+	private TextField searchField = new TextField();
+	private FormLayout editorLayout = new FormLayout();
+	private FieldGroup editorFields = new FieldGroup();
+	private Table productList = new Table();
+	private LazyQueryContainer container;
+
+	private static final String[] fieldNames = new String[] { "serial",
 			"supplier", "notes", "createdOn", "warranty" };
-	private final String title;
 	private CkokService service;
 	
-	CkokApplication(CkokService service, String title) {
+	public CkokApplication(CkokService service, String title) {
 		this.service = service;
-		this.title = title;
+		getPage().setTitle(title);
 	}
 
 	@Override
 	public void init(VaadinRequest request) {
-		final GridLayout layout = new GridLayout(1, 3);
-		layout.setWidth("100%");
-		layout.setMargin(false);
+		initLayout();
+		initProductList();
+		initSearch();
+	}
 
-		//final BeanContainer<String, Product> beans = new BeanContainer<String, Product>(
-		//		Product.class);
-		//beans.setBeanIdProperty("id");
+	private void initLayout() {
+		HorizontalSplitPanel splitPanel = new HorizontalSplitPanel();
+		setContent(splitPanel);
 
-		// Text field for inputting a filter
-		final TextField tf = new TextField("Search");
-		tf.focus();
-		layout.addComponent(tf);
+		VerticalLayout leftLayout = new VerticalLayout();
+		splitPanel.addComponent(leftLayout);
+		splitPanel.addComponent(editorLayout);
+		HorizontalLayout bottomLeftLayout = new HorizontalLayout();
+		leftLayout.addComponent(bottomLeftLayout);
+		bottomLeftLayout.addComponent(searchField);
+		leftLayout.addComponent(productList);
 
+		/* Set the contents in the left of the split panel to use all the space */
+		leftLayout.setSizeFull();
+
+		/*
+		 * On the left side, expand the size of the productList so that it uses
+		 * all the space left after from bottomLeftLayout
+		 */
+		leftLayout.setExpandRatio(productList, 1);
+		productList.setSizeFull();
+
+		/*
+		 * In the bottomLeftLayout, searchField takes all the width there is
+		 * after adding addNewContactButton. The height of the layout is defined
+		 * by the tallest component.
+		 */
+		bottomLeftLayout.setWidth("100%");
+		searchField.setWidth("100%");
+		bottomLeftLayout.setExpandRatio(searchField, 1);
+
+		/* Put a little margin around the fields in the right side editor */
+		editorLayout.setMargin(true);
+		editorLayout.setVisible(false);
+	}
+
+	private void initProductList() {
 		BeanQueryFactory<ProductBeanQuery> queryFactory = new
 				BeanQueryFactory<ProductBeanQuery>(ProductBeanQuery.class);
-		
 
 		Map<String,Object> queryConfiguration = new HashMap<String,Object>();
 		queryConfiguration.put("service", service);
 		queryFactory.setQueryConfiguration(queryConfiguration);
 
-//		final Form form = new Form();
-//		form.setLocale(Locale.ENGLISH);
-		final Table table = new Table();
-
-		final LazyQueryContainer container = new LazyQueryContainer(queryFactory, "id", 50, false);
+		container = new LazyQueryContainer(queryFactory, "id", 50, false);
 		container.addContainerProperty("productType.name", String.class, "", true, true);
 		container.addContainerProperty("productType.partnum", String.class, "", true, true);
 		container.addContainerProperty("serial", String.class, "", true, true);		
 		container.addContainerProperty("supplier", String.class, "", true, true);
 		container.addContainerProperty("notes", String.class, "", true, true);
-		container.addContainerProperty("createdOn", Date.class, "", true, true);
-		container.addContainerProperty("warranty", Date.class, "", true, true);
-		table.setContainerDataSource(container);
 		container.getQueryView().getQueryDefinition().setMaxNestedPropertyDepth(2);
 
-		//MenuBar menu = createMenuBar(beans, table);
-		//layout.addComponent(menu);
-/*
-		table.setSelectable(true);
-		table.setImmediate(true);
-		table.setVisibleColumns(VISIBLE_COLUMNS);
-		table.addListener(new Property.ValueChangeListener() {
-			public void valueChange(ValueChangeEvent event) {
-				Object selectedId = table.getValue();
-				if (selectedId == null) {
-					return;
-				}
-				@SuppressWarnings("unchecked")
-				BeanItem<Product> item = (BeanItem<Product>) table
-						.getItem(selectedId);
+		productList.setContainerDataSource(container);
+		productList.setSelectable(true);
+		productList.setImmediate(true);
+	}
 
-				form.setItemDataSource(item);
-				form.setVisibleItemProperties(VISIBLE_COLUMNS);
-
-			}
-		});
-*/		
-		//update(beans);
-		layout.addComponent(table);
+	private void initSearch() {
+		/*
+		 * We want to show a subtle prompt in the search field. We could also
+		 * set a caption that would be shown above the field or description to
+		 * be shown in a tooltip.
+		 */
+		searchField.setInputPrompt("Search products");
 
 		/*
-		if (table.getItemIds().iterator().hasNext()) {
-			Object first = table.getItemIds().iterator().next();
-			Item item = table.getItem(first);
-			form.setItemDataSource(item);
-		}
+		 * Granularity for sending events over the wire can be controlled. By
+		 * default simple changes like writing a text in TextField are sent to
+		 * server with the next Ajax call. You can set your component to be
+		 * immediate to send the changes to server immediately after focus
+		 * leaves the field. Here we choose to send the text over the wire as
+		 * soon as user stops writing for a moment.
+		 */
+		searchField.setTextChangeEventMode(TextChangeEventMode.LAZY);
 
-		form.setCaption("Edit Task");
-		form.setVisibleItemProperties(VISIBLE_COLUMNS);
-		form.setImmediate(true);
-		*/
 		/*
-		form.setFormFieldFactory(new DefaultFieldFactory() {
-			@Override
-			public Field createField(Item item, Object propertyId,
-					com.vaadin.ui.Component uiContext) {
-				final AbstractField field = (AbstractField) super.createField(
-						item, propertyId, uiContext);
-				field.addListener(new ValueChangeListener() {
-					@Override
-					public void valueChange(ValueChangeEvent event) {
-						BeanItem<Product> item = (BeanItem<Product>) form
-								.getItemDataSource();
-						UpdateProduct request = new UpdateProduct();
-						request.setProduct(item.getBean());
-						service.updateProduct(request);
-						// submit.setEnabled(form.isModified());
-					}
-				});
-				field.setImmediate(true);
+		 * When the event happens, we handle it in the anonymous inner class.
+		 * You may choose to use separate controllers (in MVC) or presenters (in
+		 * MVP) instead. In the end, the preferred application architecture is
+		 * up to you.
+		 */
+		searchField.addTextChangeListener(new TextChangeListener() {
+			public void textChange(final TextChangeEvent event) {
 
-				return field;
-			}
-		});*/
-
-		// Filter table according to typed input
-		tf.addTextChangeListener(new TextChangeListener() {
-			Filter filter = null;
-
-			public void textChange(TextChangeEvent event) {
-				Filterable f = (Filterable) table.getContainerDataSource();
-
-				// Remove old filter
-				if (filter != null)
-					f.removeContainerFilter(filter);
-
-				filter = new QuickSearchFilter(event.getText());
-				
-				f.addContainerFilter(filter);
+				/* Reset the filter for the contactContainer. */
+				container.removeAllContainerFilters();
+				container.addContainerFilter(new QuickSearchFilter(event
+						.getText()));
 				container.refresh();
+				
 			}
 		});
-
-		/*
-		 * form.addListener(new Property.ValueChangeListener() { public void
-		 * valueChange(ValueChangeEvent event) {
-		 * 
-		 * @SuppressWarnings("unchecked") BeanItem<Product> item =
-		 * (BeanItem<Product>) form.getItemDataSource();
-		 * productDAO.update(item.getBean()); } });
-		 */
-
-		setContent(layout);
-	}
-
-	private MenuBar createMenuBar(final BeanContainer<String, Product> beans,
-			final Table table) {
-		MenuBar menu = new MenuBar();
-		menu.setImmediate(true);
-		menu.addItem("Reload", new Command() {
-			public void menuSelected(MenuItem selectedItem) {
-				update(beans);
-			}
-		});
-		/*
-		 * menu.addItem("Add", new Command() { public void menuSelected(MenuItem
-		 * selectedItem) { Task task = new Task();
-		 * task.setId(UUID.randomUUID().toString()); task.setTitle("New Task");
-		 * task.setDescription("None"); taskService.addTask(task);
-		 * beans.addBean(task); } }); menu.addItem("Delete", new Command() {
-		 * public void menuSelected(MenuItem selectedItem) { String id =
-		 * (String) table.getValue(); taskService.deleteTask(id);
-		 * table.removeItem(id); } });
-		 */
-		return menu;
-	}
-
-	private void update(final BeanContainer<String, Product> beans) {
-		beans.removeAllItems();
-		beans.addAll(service.getAllProducts(new GetAllProducts()).getReturn());
-	}
-
+	}	
 }

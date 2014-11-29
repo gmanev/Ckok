@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
@@ -31,11 +32,22 @@ public class ProductDAOImpl extends GenericDAOImpl<Product> implements ProductDA
 		select.where(quickSearchWhere(cb, p, searchString));
 
 		if (orderBy != null) {
-			if (orderBy.isAscending()) {
-				select.orderBy(cb.asc(p.get(orderBy.getAttributeName())));				
+			Path<?> field;
+			String name = orderBy.getAttributeName();
+			if (name.equalsIgnoreCase("productType.name")) {
+				field = p.get(Product_.productType).get(ProductType_.name);
+			}
+			else if (name.equalsIgnoreCase("productType.partnum")) {
+				field = p.get(Product_.productType).get(ProductType_.partnum);
 			}
 			else {
-				select.orderBy(cb.desc(p.get(orderBy.getAttributeName())));
+				field = p.get(name);
+			}
+			if (orderBy.isAscending()) {
+				select.orderBy(cb.asc(field));				
+			}
+			else {
+				select.orderBy(cb.desc(field));
 			}
 		}
 
@@ -58,7 +70,7 @@ public class ProductDAOImpl extends GenericDAOImpl<Product> implements ProductDA
 	}
 
 	private Predicate quickSearchWhere(CriteriaBuilder cb, Root<Product> p, String searchString) {
-		String pattern = "%" + searchString + "%";		
+		String pattern = "%" + searchString.toLowerCase() + "%";		
 		return cb.or(
 				cb.like(cb.lower(p.get(Product_.productType).get(ProductType_.name)), pattern),
 				cb.like(cb.lower(p.get(Product_.productType).get(ProductType_.partnum)), pattern),
