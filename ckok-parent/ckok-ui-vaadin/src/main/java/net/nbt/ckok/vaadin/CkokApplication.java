@@ -1,7 +1,9 @@
 package net.nbt.ckok.vaadin;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import net.nbt.ckok.service.CkokService;
 
@@ -9,6 +11,8 @@ import org.vaadin.addons.lazyquerycontainer.BeanQueryFactory;
 import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
 
 import com.vaadin.annotations.Theme;
+import com.vaadin.data.Property;
+import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
@@ -25,14 +29,29 @@ import com.vaadin.ui.VerticalLayout;
 @Theme("valo")
 public class CkokApplication extends UI {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1397927563254499684L;
 	private TextField searchField = new TextField();
 	private FormLayout editorLayout = new FormLayout();
 	private FieldGroup editorFields = new FieldGroup();
 	private Table productList = new Table();
 	private LazyQueryContainer container;
+	private Locale locale;
+	private ResourceBundle messages;
 
-	private static final String[] fieldNames = new String[] { "serial",
-			"supplier", "notes", "createdOn", "warranty" };
+	private static final Object[] tableFieldNames = new String[] {
+			"productType.name", "productType.partnum",
+			"serial", "supplier", "notes" 
+	};
+
+	private static final Object[] editorFieldNames = new String[] {
+		"productType.name", "productType.partnum",
+		"serial", "supplier", "notes",
+		"createdOn", "warranty"
+	};
+
 	private CkokService service;
 	
 	public CkokApplication(CkokService service, String title) {
@@ -42,9 +61,16 @@ public class CkokApplication extends UI {
 
 	@Override
 	public void init(VaadinRequest request) {
+		initLocale(request);
 		initLayout();
 		initProductList();
+		initEditor();
 		initSearch();
+	}
+
+	private void initLocale(VaadinRequest request) {
+		locale = new Locale("bg", "BG");
+		messages = ResourceBundle.getBundle("Messages", locale);
 	}
 
 	private void initLayout() {
@@ -92,16 +118,35 @@ public class CkokApplication extends UI {
 		queryFactory.setQueryConfiguration(queryConfiguration);
 
 		container = new LazyQueryContainer(queryFactory, "id", 50, false);
-		container.addContainerProperty("productType.name", String.class, "", true, true);
-		container.addContainerProperty("productType.partnum", String.class, "", true, true);
-		container.addContainerProperty("serial", String.class, "", true, true);		
-		container.addContainerProperty("supplier", String.class, "", true, true);
-		container.addContainerProperty("notes", String.class, "", true, true);
-		container.getQueryView().getQueryDefinition().setMaxNestedPropertyDepth(2);
+		container.getQueryView().getQueryDefinition().setMaxNestedPropertyDepth(1);
 
+		for (int i=0; i<tableFieldNames.length; i++) {
+			container.addContainerProperty(tableFieldNames[i], String.class, "");
+			productList.setColumnHeader(tableFieldNames[i], messages.getString("product." + tableFieldNames[i]));
+		}
+		
 		productList.setContainerDataSource(container);
 		productList.setSelectable(true);
 		productList.setImmediate(true);
+
+
+		productList.addValueChangeListener(new Property.ValueChangeListener() {
+			public void valueChange(ValueChangeEvent event) {
+				Object productId = productList.getValue();
+
+				/*
+				 * When a contact is selected from the list, we want to show
+				 * that in our editor on the right. This is nicely done by the
+				 * FieldGroup that binds all the fields to the corresponding
+				 * Properties in our contact at once.
+				 */
+				if (productId != null)
+					editorFields.setItemDataSource(productList
+							.getItem(productId));
+				
+				editorLayout.setVisible(productId != null);
+			}
+		});
 	}
 
 	private void initSearch() {
@@ -110,7 +155,7 @@ public class CkokApplication extends UI {
 		 * set a caption that would be shown above the field or description to
 		 * be shown in a tooltip.
 		 */
-		searchField.setInputPrompt("Search products");
+		searchField.setInputPrompt(messages.getString("product.search"));
 
 		/*
 		 * Granularity for sending events over the wire can be controlled. By
@@ -139,5 +184,30 @@ public class CkokApplication extends UI {
 				
 			}
 		});
-	}	
+	}
+
+
+	private void initEditor() {
+
+		/* User interface can be created dynamically to reflect underlying data. */
+		for (Object fieldName : editorFieldNames) {
+			TextField field = new TextField(messages.getString("product." + fieldName));
+			editorLayout.addComponent(field);
+			field.setWidth("100%");
+			field.setNullRepresentation("");
+
+			/*
+			 * We use a FieldGroup to connect multiple components to a data
+			 * source at once.
+			 */
+			editorFields.bind(field, fieldName);
+		}
+
+		/*
+		 * Data can be buffered in the user interface. When doing so, commit()
+		 * writes the changes to the data source. Here we choose to write the
+		 * changes automatically without calling commit().
+		 */
+		editorFields.setBuffered(true);
+	}
 }
