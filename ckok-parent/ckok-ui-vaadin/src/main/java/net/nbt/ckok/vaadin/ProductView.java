@@ -4,11 +4,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import net.nbt.ckok.model.Operation;
+import net.nbt.ckok.model.Product;
 import net.nbt.ckok.service.CkokService;
+import net.nbt.ckok.service.GetProductById;
+import net.nbt.ckok.service.NoSuchProductException;
 
 import org.vaadin.addons.lazyquerycontainer.BeanQueryFactory;
 import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
 
+import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.fieldgroup.FieldGroup;
@@ -18,7 +23,7 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.AbstractTextField.TextChangeEventMode;
 import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -30,6 +35,8 @@ public class ProductView extends VerticalLayout implements View {
 	private FormLayout editorLayout = new FormLayout();
 	private FieldGroup editorFields = new FieldGroup();
 	private Table productList = new Table();
+	private Table history = new Table();
+	private TabSheet tabsheet = new TabSheet();	
 	private LazyQueryContainer container;
 	private final ResourceBundle messages;
 	private final CkokService service;
@@ -61,41 +68,23 @@ public class ProductView extends VerticalLayout implements View {
 	
 	public void initLayout() {
 		setSizeFull();
+
+		tabsheet.addTab(editorLayout, messages.getString("product.tab.details"));
 		
 		VerticalSplitPanel splitPanel = new VerticalSplitPanel();
+		splitPanel.setFirstComponent(productList);
+		splitPanel.setSecondComponent(tabsheet);
 
-		VerticalLayout topLayout = new VerticalLayout();
-		splitPanel.addComponent(topLayout);
-		splitPanel.addComponent(editorLayout);
-		HorizontalLayout bottomLeftLayout = new HorizontalLayout();
-		topLayout.addComponent(bottomLeftLayout);
-		bottomLeftLayout.addComponent(searchField);
-		topLayout.addComponent(productList);
-
-		/* Set the contents in the left of the split panel to use all the space */
-		topLayout.setSizeFull();
-
-		/*
-		 * On the left side, expand the size of the productList so that it uses
-		 * all the space left after from bottomLeftLayout
-		 */
-		topLayout.setExpandRatio(productList, 1);
 		productList.setSizeFull();
-
-		/*
-		 * In the bottomLeftLayout, searchField takes all the width there is
-		 * after adding addNewContactButton. The height of the layout is defined
-		 * by the tallest component.
-		 */
-		bottomLeftLayout.setWidth("100%");
-		searchField.setWidth("100%");
-		bottomLeftLayout.setExpandRatio(searchField, 1);
-
-		/* Put a little margin around the fields in the right side editor */
-		editorLayout.setMargin(true);
-		editorLayout.setVisible(false);
-
+		
+		addComponent(searchField);
 		addComponent(splitPanel);
+
+		searchField.setWidth("100%");
+		editorLayout.setMargin(true);
+		tabsheet.setVisible(false);
+
+		setExpandRatio(splitPanel, 1);
 	}
 
 	private void initProductList() {
@@ -122,81 +111,52 @@ public class ProductView extends VerticalLayout implements View {
 		productList.addValueChangeListener(new Property.ValueChangeListener() {
 			public void valueChange(ValueChangeEvent event) {
 				Object productId = productList.getValue();
-
-				/*
-				 * When a contact is selected from the list, we want to show
-				 * that in our editor on the right. This is nicely done by the
-				 * FieldGroup that binds all the fields to the corresponding
-				 * Properties in our contact at once.
-				 */
 				if (productId != null)
 					editorFields.setItemDataSource(productList
 							.getItem(productId));
 				
-				editorLayout.setVisible(productId != null);
+				if (productId != null) {
+					try {
+						Product p = service.getProductById(new GetProductById(Integer.parseInt(productId.toString()))).getReturn();
+						for (Operation op : p.getOperations()) {
+							System.out.println(op);
+						}
+					} catch (NumberFormatException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (NoSuchProductException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				
+				tabsheet.setVisible(productId != null);
 			}
 		});
 	}
 
 	private void initSearch() {
-		/*
-		 * We want to show a subtle prompt in the search field. We could also
-		 * set a caption that would be shown above the field or description to
-		 * be shown in a tooltip.
-		 */
 		searchField.setInputPrompt(messages.getString("product.search"));
-
-		/*
-		 * Granularity for sending events over the wire can be controlled. By
-		 * default simple changes like writing a text in TextField are sent to
-		 * server with the next Ajax call. You can set your component to be
-		 * immediate to send the changes to server immediately after focus
-		 * leaves the field. Here we choose to send the text over the wire as
-		 * soon as user stops writing for a moment.
-		 */
 		searchField.setTextChangeEventMode(TextChangeEventMode.LAZY);
-
-		/*
-		 * When the event happens, we handle it in the anonymous inner class.
-		 * You may choose to use separate controllers (in MVC) or presenters (in
-		 * MVP) instead. In the end, the preferred application architecture is
-		 * up to you.
-		 */
 		searchField.addTextChangeListener(new TextChangeListener() {
 			public void textChange(final TextChangeEvent event) {
-
-				/* Reset the filter for the contactContainer. */
 				container.removeAllContainerFilters();
 				container.addContainerFilter(new QuickSearchFilter(event
 						.getText()));
 				container.refresh();
-				
 			}
 		});
 	}
 
 
 	private void initEditor() {
-
-		/* User interface can be created dynamically to reflect underlying data. */
 		for (Object fieldName : editorFieldNames) {
 			TextField field = new TextField(messages.getString("product." + fieldName));
 			editorLayout.addComponent(field);
-			field.setWidth("100%");
+			field.setWidth("50%");
 			field.setNullRepresentation("");
-
-			/*
-			 * We use a FieldGroup to connect multiple components to a data
-			 * source at once.
-			 */
 			editorFields.bind(field, fieldName);
 		}
-
-		/*
-		 * Data can be buffered in the user interface. When doing so, commit()
-		 * writes the changes to the data source. Here we choose to write the
-		 * changes automatically without calling commit().
-		 */
 		editorFields.setBuffered(true);
 	}
 

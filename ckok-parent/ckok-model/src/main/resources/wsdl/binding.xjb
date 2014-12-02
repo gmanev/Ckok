@@ -7,8 +7,16 @@
 	<jaxb:bindings schemaLocation="ckok.xsd" node="/xsd:schema">
 		<hj:ignored-package name="net.nbt.ckok.service" />
 		<hj:persistence>
-			<hj:default-one-to-many fetch="EAGER" />
+			<hj:default-one-to-many fetch="EAGER">
+            	<orm:join-table/>
+			</hj:default-one-to-many>
+			<hj:default-many-to-one fetch="EAGER" />			
+			<hj:default-many-to-many fetch="EAGER">
+            	<orm:join-table/>
+			</hj:default-many-to-many>			
 		</hj:persistence>
+
+		<!-- ProductType -->
 		<jaxb:bindings node="xsd:complexType[@name='ProductType']">
 			<hj:entity>
 				<orm:table name="CKOK_NOMEN" />
@@ -25,7 +33,8 @@
 				</hj:basic>
 			</jaxb:bindings>
 		</jaxb:bindings>
-
+		
+		<!-- Product -->		
 		<jaxb:bindings node="xsd:complexType[@name='Product']">
 			<hj:entity>
 				<orm:table name="CKOK_PRODUCTS" />
@@ -35,19 +44,77 @@
 					<orm:column name="LAST"></orm:column>
 				</hj:basic>
 			</jaxb:bindings>
+			<jaxb:bindings node="xsd:sequence/xsd:element[@name='id']">
+				<hj:id>
+					<orm:column name="PRODUCT_ID" />
+					<orm:generated-value strategy="TABLE" />
+				</hj:id>
+			</jaxb:bindings>
+			<jaxb:bindings node="xsd:sequence/xsd:element[@name='productType']">
+				<hj:many-to-one>
+					<orm:join-column name="NOMEN_ID" />
+				</hj:many-to-one>
+			</jaxb:bindings>
+			<jaxb:bindings node="xsd:sequence/xsd:element[@name='operations']">
+				<hj:many-to-many>
+					<orm:join-table name="CKOK_TRAN">
+                    	<orm:join-column name="TINFO_ID" />
+                        <orm:inverse-join-column name="PRODUCT_ID"/>
+                    </orm:join-table>
+				</hj:many-to-many>
+			</jaxb:bindings>
 		</jaxb:bindings>
-		<jaxb:bindings
-			node="xsd:complexType[@name='Product']/xsd:sequence/xsd:element[@name='id']">
-			<hj:id>
-				<orm:column name="PRODUCT_ID" />
-				<orm:generated-value strategy="TABLE" />
-			</hj:id>
+
+		<!-- Customer -->
+		<jaxb:bindings node="xsd:complexType[@name='Customer']">
+			<hj:entity>
+				<orm:table name="NCC_CUSTOMER" />
+			</hj:entity>
+			<jaxb:bindings node="xsd:sequence/xsd:element[@name='customerId']">
+				<hj:id>
+					<orm:column name="CUSTOMER_ID" />
+					<orm:generated-value strategy="TABLE" />
+				</hj:id>
+			</jaxb:bindings>
+			<jaxb:bindings node="xsd:sequence/xsd:element[@name='name']">
+				<hj:basic>
+					<orm:column name="NAME"></orm:column>
+				</hj:basic>
+			</jaxb:bindings>
+			<!-- 
+			<jaxb:bindings node="xsd:sequence/xsd:element[@name='operations']">
+				<hj:one-to-many mapped-by="customer">
+					<orm:join-column name="CUSTOMER_ID"/>
+				</hj:one-to-many>
+			</jaxb:bindings>
+			 -->
+		</jaxb:bindings>		
+
+		<!-- Operation -->
+		<jaxb:bindings node="xsd:complexType[@name='Operation']">
+			<hj:entity>
+				<orm:table name="CKOK_TINFO" />
+			</hj:entity>
+			<jaxb:bindings node="xsd:sequence/xsd:element[@name='id']">
+				<hj:id>
+					<orm:column name="TINFO_ID" />
+					<orm:generated-value strategy="TABLE" />
+				</hj:id>
+			</jaxb:bindings> 
+			<jaxb:bindings node="xsd:sequence/xsd:element[@name='customer']">
+				<hj:many-to-one>
+					<orm:join-column name="CUSTOMER_ID"/>				
+				</hj:many-to-one>
+			</jaxb:bindings>
+			<jaxb:bindings node="xsd:sequence/xsd:element[@name='ts2']">
+				<hj:basic>
+					<orm:column name="TS2"></orm:column>
+				</hj:basic>
+			</jaxb:bindings>
+			<jaxb:bindings node="xsd:sequence/xsd:element[@name='products']">
+				<hj:many-to-many mapped-by="operations" />
+			</jaxb:bindings>
 		</jaxb:bindings>
-		<jaxb:bindings
-			node="xsd:complexType[@name='Product']/xsd:sequence/xsd:element[@name='productType']">
-			<hj:many-to-one>
-				<orm:join-column name="NOMEN_ID" />
-			</hj:many-to-one>
-		</jaxb:bindings>
+
 	</jaxb:bindings>
 </jaxb:bindings>

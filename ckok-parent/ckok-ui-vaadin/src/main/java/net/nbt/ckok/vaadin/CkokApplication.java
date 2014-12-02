@@ -8,6 +8,10 @@ import net.nbt.ckok.service.CkokService;
 import com.vaadin.annotations.Theme;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.Tree;
 import com.vaadin.ui.UI;
 
 @Theme("valo")
@@ -33,10 +37,34 @@ public class CkokApplication extends UI {
 		locale = new Locale("bg", "BG");
 		messages = ResourceBundle.getBundle("Messages", locale);
 
-		navigator = new Navigator(this, this);
-		navigator.addView(PRODUCTVIEW, new ProductView(service, messages));
-		
-		navigator.navigateTo(PRODUCTVIEW);
+		initLayout();
 	}
 
+	private void initLayout() {
+
+        setSizeFull();
+        
+        // Layout with menu on left and view area on right
+        HorizontalLayout hLayout = new HorizontalLayout();
+        hLayout.setSizeFull();
+        
+		Tree menu = new Tree();
+		menu.setStyleName("menu");
+		menu.addItem(PRODUCTVIEW);
+
+		Panel panel = new Panel();
+		Label l = new Label("test");
+		panel.setContent(l);
+		panel.setSizeFull();
+
+		hLayout.addComponent(menu);
+		hLayout.addComponent(panel);
+        hLayout.setExpandRatio(panel, 1);
+        
+		setContent(hLayout);
+		
+		navigator = new Navigator(this, panel);
+		navigator.addView(PRODUCTVIEW, new ProductView(service, messages));
+		navigator.navigateTo(PRODUCTVIEW);		
+	}
 }
