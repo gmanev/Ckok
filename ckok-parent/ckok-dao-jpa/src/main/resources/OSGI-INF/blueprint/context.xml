@@ -16,11 +16,20 @@
 		<tx:transaction method="*" value="Required" />
 	</bean>
 
-	<service ref="productDAO" interface="net.nbt.ckok.model.dao.ProductDAO">
-		<service-properties>
-			<!-- This property is only important for the DOSGi tutorial -->
-			<entry key="service.exported.interfaces" value="*" />
-		</service-properties>
-	</service>
+	<service ref="productDAO" interface="net.nbt.ckok.model.dao.ProductDAO" />
+
+	<bean id="operationDAO" class="net.nbt.ckok.dao.jpa.impl.OperationDAOImpl">
+		<jpa:context unitname="ckok" property="entityManager" />
+		<tx:transaction method="*" value="Required" />
+	</bean>
+
+	<service ref="operationDAO" interface="net.nbt.ckok.model.dao.OperationDAO" />
+
+	<bean id="customerDAO" class="net.nbt.ckok.dao.jpa.impl.CustomerDAOImpl">
+		<jpa:context unitname="ckok" property="entityManager" />
+		<tx:transaction method="*" value="Required" />
+	</bean>
+
+	<service ref="customerDAO" interface="net.nbt.ckok.model.dao.CustomerDAO" />
 
 </blueprint>

@@ -55,8 +55,7 @@
 					<variant>jpa2</variant>
 				</configuration>
 			</plugin>
-
-			<plugin>
+ 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.2</version>
@@ -152,7 +151,7 @@
 										<!-- Turns on the hashCode plugin -->
 										<!-- <extraarg>-xjc-XhashCode</extraarg> -->
 										<!-- Turns on the equals plugin -->
-										<!-- <extraarg>-xjc-Xequals</extraarg> -->
+										<!--  <extraarg>-xjc-Xequals</extraarg> -->
 										<extraarg>-xjc-Xhyperjaxb3-jpa2</extraarg>
 									</extraargs>
 								</wsdlOption>

@@ -6,10 +6,11 @@ import java.util.ResourceBundle;
 import net.nbt.ckok.service.CkokService;
 
 import com.vaadin.annotations.Theme;
+import com.vaadin.event.ItemClickEvent;
+import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.UI;
@@ -18,6 +19,7 @@ import com.vaadin.ui.UI;
 public class CkokApplication extends UI {
 
 	private static final String PRODUCTVIEW = "product";
+	private static final String CUSTOMERVIEW = "customer";
 	
 	private Locale locale;
 	private ResourceBundle messages;
@@ -49,12 +51,28 @@ public class CkokApplication extends UI {
         hLayout.setSizeFull();
         
 		Tree menu = new Tree();
-		menu.setStyleName("menu");
-		menu.addItem(PRODUCTVIEW);
+		final String customerView = messages.getString(CUSTOMERVIEW);
+		final String productView = messages.getString(PRODUCTVIEW);
+		menu.setStyleName("menu");		
+		menu.addItem(customerView);
+		menu.addItem(productView);
+		menu.addItemClickListener(new ItemClickListener() {
+
+			@Override
+			public void itemClick(ItemClickEvent event) {
+				if (event.getItemId() != null) {
+					if (event.getItemId().equals(productView)) {
+						navigator.navigateTo(PRODUCTVIEW);						
+					}
+					else if (event.getItemId().equals(customerView)) {
+						navigator.navigateTo(CUSTOMERVIEW);						
+					}
+				}
+			}
+			
+		});
 
 		Panel panel = new Panel();
-		Label l = new Label("test");
-		panel.setContent(l);
 		panel.setSizeFull();
 
 		hLayout.addComponent(menu);
@@ -64,7 +82,8 @@ public class CkokApplication extends UI {
 		setContent(hLayout);
 		
 		navigator = new Navigator(this, panel);
+		navigator.addView(CUSTOMERVIEW, new CustomerView(service, messages));
 		navigator.addView(PRODUCTVIEW, new ProductView(service, messages));
-		navigator.navigateTo(PRODUCTVIEW);		
+		navigator.navigateTo(CUSTOMERVIEW);
 	}
 }
