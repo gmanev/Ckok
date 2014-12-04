@@ -3,23 +3,23 @@ package net.nbt.ckok.vaadin;
 import java.util.List;
 import java.util.Map;
 
-import net.nbt.ckok.model.Product;
+import net.nbt.ckok.model.Customer;
 import net.nbt.ckok.service.CkokService;
+import net.nbt.ckok.service.CustomersQuickSearch;
+import net.nbt.ckok.service.CustomersQuickSearchCount;
 import net.nbt.ckok.service.OrderBy;
-import net.nbt.ckok.service.ProductsQuickSearch;
-import net.nbt.ckok.service.ProductsQuickSearchCount;
 
 import org.vaadin.addons.lazyquerycontainer.AbstractBeanQuery;
 import org.vaadin.addons.lazyquerycontainer.QueryDefinition;
 
-public class ProductBeanQuery extends AbstractBeanQuery<Product> {
+public class CustomerBeanQuery extends AbstractBeanQuery<Customer> {
 
 	private int size = -1;
 	private OrderBy orderBy = null;
 	private String searchString = "";
 	private CkokService service;
 	
-	public ProductBeanQuery(QueryDefinition definition,
+	public CustomerBeanQuery(QueryDefinition definition,
 			Map<String, Object> queryConfiguration, Object[] sortPropertyIds,
 			boolean[] sortStates) {
 		super(definition, queryConfiguration, sortPropertyIds, sortStates);
@@ -41,34 +41,34 @@ public class ProductBeanQuery extends AbstractBeanQuery<Product> {
 	}
 	
 	@Override
-	protected Product constructBean() {
-		return new Product();
-	}
-
-	@Override
-	protected List<Product> loadBeans(int startIndex, int count) {
-		ProductsQuickSearch parameters = 
-				new ProductsQuickSearch(
-						startIndex,
-						count,
-						searchString,
-						orderBy);
-		return service.productsQuickSearch(parameters).getReturn();
-	}
-
-	@Override
-	protected void saveBeans(List<Product> addedProducts, List<Product> modifiedProducts,
-			List<Product> removedProducts) {
-        throw new UnsupportedOperationException();		
+	protected Customer constructBean() {
+		return new Customer();
 	}
 
 	@Override
 	public int size() {
 		if (size == -1) {
-			size = service.productsQuickSearchCount(
-					new ProductsQuickSearchCount(searchString)).getCount();
+			size = service.customersQuickSearchCount(
+					new CustomersQuickSearchCount(searchString)).getCount();
 		}
-		return size; 
+		return size;
+	}
+
+	@Override
+	protected List<Customer> loadBeans(int startIndex, int count) {
+		CustomersQuickSearch parameters = 
+				new CustomersQuickSearch(
+						startIndex,
+						count,
+						searchString,
+						orderBy);
+		return service.customersQuickSearch(parameters).getReturn();
+	}
+
+	@Override
+	protected void saveBeans(List<Customer> addedBeans,
+			List<Customer> modifiedBeans, List<Customer> removedBeans) {
+        throw new UnsupportedOperationException();		
 	}
 
 }

@@ -11,6 +11,8 @@
         <class>net.nbt.ckok.model.ProductType</class>
         <class>net.nbt.ckok.model.Customer</class>
         <class>net.nbt.ckok.model.Operation</class>
+        <class>net.nbt.ckok.model.Contact</class>
+        <class>net.nbt.ckok.model.Contract</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
        
         <properties>

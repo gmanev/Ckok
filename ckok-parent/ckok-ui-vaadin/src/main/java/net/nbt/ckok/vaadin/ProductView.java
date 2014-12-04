@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import net.nbt.ckok.model.Operation;
 import net.nbt.ckok.service.CkokService;
 import net.nbt.ckok.service.GetProductOperations;
 
@@ -14,7 +13,6 @@ import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.fieldgroup.FieldGroup;
-import com.vaadin.data.util.BeanContainer;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.navigator.View;
@@ -33,21 +31,20 @@ public class ProductView extends VerticalLayout implements View {
 	private FormLayout editorLayout = new FormLayout();
 	private FieldGroup editorFields = new FieldGroup();
 	private Table productList = new Table();
-	private Table history = new Table();
 	private TabSheet tabsheet = new TabSheet();	
 	private LazyQueryContainer container;
-	private BeanContainer<Integer, Operation> operations;
 	private final ResourceBundle messages;
 	private final CkokService service;
+	private OpList oplist;
 
 	public ProductView(CkokService service, ResourceBundle messages) {
 		this.service = service;
 		this.messages = messages;
+		oplist = new OpList(messages);
 		initLayout();
 		initProductList();
 		initEditor();
 		initSearch();
-		initHistory();
 	}
 	
 	private static final Object[] tableFieldNames = new String[] {
@@ -70,9 +67,7 @@ public class ProductView extends VerticalLayout implements View {
 		setSizeFull();
 
 		tabsheet.addTab(editorLayout, messages.getString("product.tab.details"));
-		history.setSizeFull();
-		history.setPageLength(5);
-		tabsheet.addTab(history, messages.getString("product.tab.history"));
+		tabsheet.addTab(oplist.getTable(), messages.getString("product.tab.history"));
 		
 		VerticalSplitPanel splitPanel = new VerticalSplitPanel();
 		splitPanel.setFirstComponent(productList);
@@ -90,22 +85,6 @@ public class ProductView extends VerticalLayout implements View {
 		setExpandRatio(splitPanel, 1);
 	}
 
-	private void initHistory() {
-		operations = new BeanContainer<>(Operation.class);
-		operations.setBeanIdProperty("id");
-		operations.addNestedContainerProperty("ts");		
-		operations.addNestedContainerProperty("customer.name");
-		operations.addNestedContainerProperty("optype");		
-		history.setContainerDataSource(operations);
-		history.setVisibleColumns("ts",
-				"customer.name",
-				"optype");
-		history.setColumnHeaders(
-				messages.getString("product.tab.history.ts"), 
-				messages.getString("product.tab.history.customer.name"), 
-				messages.getString("product.tab.history.optype"));		
-	}
-	
 	private void initProductList() {
 		BeanQueryFactory<ProductBeanQuery> queryFactory = new
 				BeanQueryFactory<ProductBeanQuery>(ProductBeanQuery.class);
@@ -135,8 +114,8 @@ public class ProductView extends VerticalLayout implements View {
 							.getItem(productId));
 
 				if (productId != null) {
-					operations.removeAllItems();
-					operations.addAll(service.getProductOperations(
+					oplist.getContainer().removeAllItems();
+					oplist.getContainer().addAll(service.getProductOperations(
 							new GetProductOperations(Integer.parseInt(productId.toString()))).getReturn());
 				}
 				

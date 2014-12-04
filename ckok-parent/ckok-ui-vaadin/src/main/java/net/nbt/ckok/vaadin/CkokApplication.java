@@ -10,7 +10,7 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
-import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.UI;
@@ -38,6 +38,10 @@ public class CkokApplication extends UI {
 
 		locale = new Locale("bg", "BG");
 		messages = ResourceBundle.getBundle("Messages", locale);
+		
+		if (getSession() != null) {
+			getSession().setLocale(locale);
+		}
 
 		initLayout();
 	}
@@ -46,25 +50,22 @@ public class CkokApplication extends UI {
 
         setSizeFull();
         
-        // Layout with menu on left and view area on right
-        HorizontalLayout hLayout = new HorizontalLayout();
-        hLayout.setSizeFull();
-        
 		Tree menu = new Tree();
-		final String customerView = messages.getString(CUSTOMERVIEW);
-		final String productView = messages.getString(PRODUCTVIEW);
-		menu.setStyleName("menu");		
-		menu.addItem(customerView);
-		menu.addItem(productView);
+		final String customerViewName = messages.getString(CUSTOMERVIEW);
+		final String productViewName = messages.getString(PRODUCTVIEW);
+		//menu.setStyleName("menu");
+		menu.setSizeFull();
+		menu.addItem(customerViewName);
+		menu.addItem(productViewName);
 		menu.addItemClickListener(new ItemClickListener() {
 
 			@Override
 			public void itemClick(ItemClickEvent event) {
 				if (event.getItemId() != null) {
-					if (event.getItemId().equals(productView)) {
+					if (event.getItemId().equals(productViewName)) {
 						navigator.navigateTo(PRODUCTVIEW);						
 					}
-					else if (event.getItemId().equals(customerView)) {
+					else if (event.getItemId().equals(customerViewName)) {
 						navigator.navigateTo(CUSTOMERVIEW);						
 					}
 				}
@@ -75,11 +76,13 @@ public class CkokApplication extends UI {
 		Panel panel = new Panel();
 		panel.setSizeFull();
 
-		hLayout.addComponent(menu);
-		hLayout.addComponent(panel);
-        hLayout.setExpandRatio(panel, 1);
+        HorizontalSplitPanel split = new HorizontalSplitPanel();
+        split.setFirstComponent(menu);
+        split.setSecondComponent(panel);
+        split.setSplitPosition(15);
+       
         
-		setContent(hLayout);
+		setContent(split);
 		
 		navigator = new Navigator(this, panel);
 		navigator.addView(CUSTOMERVIEW, new CustomerView(service, messages));
