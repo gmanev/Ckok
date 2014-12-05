@@ -62,6 +62,9 @@ public class CustomerDAOImpl extends GenericDAOImpl<Customer> implements Custome
 	}
 
 	private Predicate quickSearchWhere(CriteriaBuilder cb, Root<Customer> p, String searchString) {
+		if (searchString.startsWith("id-")) {
+			return cb.equal(p.get(Customer_.id), Integer.valueOf(searchString.substring(3)));
+		}
 		String pattern = "%" + searchString.toLowerCase() + "%";		
 		return cb.like(cb.lower(p.get(Customer_.name)), pattern);
 	}

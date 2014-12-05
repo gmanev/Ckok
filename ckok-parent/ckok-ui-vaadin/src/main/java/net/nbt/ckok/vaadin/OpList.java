@@ -21,12 +21,15 @@ public class OpList {
 	private void initBinding() {
 		beans.setBeanIdProperty("id");
 		beans.addNestedContainerProperty("ts");		
+		beans.addNestedContainerProperty("customer.id");
 		beans.addNestedContainerProperty("customer.name");
 		beans.addNestedContainerProperty("optype");		
 		table.setContainerDataSource(beans);
 		table.setVisibleColumns("ts",
 				"optype", "n", "customer.name");
 		table.addGeneratedColumn("optype", new OpTypeColumnGenerator(bundle));
+		table.addGeneratedColumn("customer.name", new IdLinkColumnGenerator("#!customer/search=id-", "customer.id"));
+		table.addGeneratedColumn("n", new IdLinkColumnGenerator("#!oper/search=id-", "id"));		
 		table.setColumnHeaders(
 				bundle.getString("oplist.ts"), 
 				bundle.getString("oplist.optype"),

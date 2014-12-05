@@ -58,8 +58,13 @@ public class CustomerView extends VerticalLayout implements View {
 	
 	@Override
 	public void enter(ViewChangeEvent event) {
-		// TODO Auto-generated method stub
-
+		ViewParameters p = new ViewParameters(event.getParameters());
+		if (p.getSearchFilter() != null) {			
+			searchField.setValue(p.getSearchFilter().getSearchString());
+			container.removeAllContainerFilters();
+			container.addContainerFilter(p.getSearchFilter());
+			container.refresh();
+		}
 	}
 
 	public void initLayout() {
@@ -104,7 +109,6 @@ public class CustomerView extends VerticalLayout implements View {
 		customerList.setSelectable(true);
 		customerList.setImmediate(true);
 
-
 		customerList.addValueChangeListener(new Property.ValueChangeListener() {
 			public void valueChange(ValueChangeEvent event) {
 				Object id = customerList.getValue();
@@ -135,7 +139,6 @@ public class CustomerView extends VerticalLayout implements View {
 			}
 		});
 	}
-
 
 	private void initEditor() {
 		for (Object fieldName : editorFieldNames) {
