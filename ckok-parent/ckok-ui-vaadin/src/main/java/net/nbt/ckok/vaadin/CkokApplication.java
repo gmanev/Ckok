@@ -6,6 +6,7 @@ import java.util.ResourceBundle;
 import net.nbt.ckok.service.CkokService;
 
 import com.vaadin.annotations.Theme;
+import com.vaadin.data.Item;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.navigator.Navigator;
@@ -20,6 +21,13 @@ public class CkokApplication extends UI {
 
 	private static final String PRODUCTVIEW = "product";
 	private static final String CUSTOMERVIEW = "customer";
+	private static final String[][] menuItems = {
+		{ "customer", null },
+		{ "product", null },
+		{ "store", null },
+		{ "product/store", "store" },
+		{ "store/nomen", "store" }
+	};
 	
 	private Locale locale;
 	private ResourceBundle messages;
@@ -47,27 +55,35 @@ public class CkokApplication extends UI {
 	}
 
 	private void initLayout() {
-
+		
         setSizeFull();
-        
+                
 		Tree menu = new Tree();
-		final String customerViewName = messages.getString(CUSTOMERVIEW);
-		final String productViewName = messages.getString(PRODUCTVIEW);
+		menu.setItemCaptionPropertyId("name");
+		menu.getContainerDataSource().addContainerProperty("name", String.class, "");
 		//menu.setStyleName("menu");
 		menu.setSizeFull();
-		menu.addItem(customerViewName);
-		menu.addItem(productViewName);
+		
+		for (String[] s : menuItems) {
+			String itemId = s[0];
+			String parentId = s[1];
+			
+			Item item = menu.addItem(itemId);
+			menu.setChildrenAllowed(itemId, false);
+			item.getItemProperty("name").setValue(messages.getString(itemId));
+			if (parentId != null) {
+				menu.setChildrenAllowed(parentId, true);
+				menu.setParent(itemId, parentId);
+				menu.expandItem(parentId);
+			}
+		}
+		
 		menu.addItemClickListener(new ItemClickListener() {
 
 			@Override
 			public void itemClick(ItemClickEvent event) {
 				if (event.getItemId() != null) {
-					if (event.getItemId().equals(productViewName)) {
-						navigator.navigateTo(PRODUCTVIEW);						
-					}
-					else if (event.getItemId().equals(customerViewName)) {
-						navigator.navigateTo(CUSTOMERVIEW);						
-					}
+					navigator.navigateTo(event.getItemId().toString());
 				}
 			}
 			
@@ -85,6 +101,7 @@ public class CkokApplication extends UI {
 		setContent(split);
 		
 		navigator = new Navigator(this, panel);
+		navigator.setErrorView(new Navigator.EmptyView());
 		navigator.addView(CUSTOMERVIEW, new CustomerView(service, messages));
 		navigator.addView(PRODUCTVIEW, new ProductView(service, messages));
 		navigator.navigateTo(CUSTOMERVIEW);

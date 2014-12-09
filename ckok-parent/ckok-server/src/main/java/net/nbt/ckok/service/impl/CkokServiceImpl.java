@@ -82,6 +82,7 @@ public class CkokServiceImpl implements CkokService {
 		response.setReturn(productDAO.quickSearch(
 				parameters.getStartIndex(),
 				parameters.getCount(),
+				parameters.getLast(),
 				parameters.getSearchString(),
 				parameters.getOrderBy()));
 		return response;
@@ -92,6 +93,7 @@ public class CkokServiceImpl implements CkokService {
 		ProductsQuickSearchCountResponse response = 
 				new ProductsQuickSearchCountResponse();
 		response.setCount(productDAO.quickSearchCount(
+				parameters.getLast(),
 				parameters.getSearchString()));
 		return response;
 	}

@@ -1,5 +1,7 @@
 package net.nbt.ckok.vaadin;
 
+import net.nbt.ckok.vaadin.filter.QuickSearchFilter;
+
 public class ViewParameters {
 
 	private QuickSearchFilter filter = null;

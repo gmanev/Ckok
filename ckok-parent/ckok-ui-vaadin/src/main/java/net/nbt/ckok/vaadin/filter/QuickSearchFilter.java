@@ -1,4 +1,4 @@
-package net.nbt.ckok.vaadin;
+package net.nbt.ckok.vaadin.filter;
 
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Item;
@@ -25,4 +25,9 @@ public class QuickSearchFilter implements Filter {
 	public String getSearchString() {
 		return searchString;
 	}
+
+	public void setSearchString(String searchString) {
+		this.searchString = searchString;
+	}
+	
 }

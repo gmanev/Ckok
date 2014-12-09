@@ -67,6 +67,7 @@
 			<xsd:element name="productsQuickSearchCount" type="tns:productsQuickSearchCount" />
 			<xsd:complexType name="productsQuickSearchCount">
 				<xsd:sequence>
+					<xsd:element minOccurs="0" name="last" type="xsd:int" />
 					<xsd:element minOccurs="0" name="searchString" type="xsd:string" />
 				</xsd:sequence>
 			</xsd:complexType>
@@ -82,6 +83,7 @@
 				<xsd:sequence>
 					<xsd:element minOccurs="0" name="startIndex" type="xsd:int" />
 					<xsd:element minOccurs="0" name="count" type="xsd:int" />
+					<xsd:element minOccurs="0" name="last" type="xsd:int" />
 					<xsd:element minOccurs="0" name="searchString" type="xsd:string" />
 					<xsd:element minOccurs="0" name="orderBy" type="tns:orderBy" />
 				</xsd:sequence>

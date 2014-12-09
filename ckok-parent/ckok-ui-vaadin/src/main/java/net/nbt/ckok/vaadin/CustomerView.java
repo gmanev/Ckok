@@ -6,6 +6,7 @@ import java.util.ResourceBundle;
 
 import net.nbt.ckok.service.CkokService;
 import net.nbt.ckok.service.GetCustomerOperations;
+import net.nbt.ckok.vaadin.filter.QuickSearchFilter;
 
 import org.vaadin.addons.lazyquerycontainer.BeanQueryFactory;
 import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;

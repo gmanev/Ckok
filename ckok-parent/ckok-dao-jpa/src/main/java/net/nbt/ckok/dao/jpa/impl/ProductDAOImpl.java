@@ -22,14 +22,14 @@ public class ProductDAOImpl extends GenericDAOImpl<Product> implements ProductDA
 	}
 
 	@Override
-	public List<Product> quickSearch(int startIndex, int count, String searchString, OrderBy orderBy) {
+	public List<Product> quickSearch(int startIndex, int count, Integer last, String searchString, OrderBy orderBy) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Product> q = cb.createQuery(Product.class);
 
 		Root<Product> p = q.from(Product.class);
 		CriteriaQuery<Product> select = q.select(p);
 
-		select.where(quickSearchWhere(cb, p, searchString));
+		select.where(quickSearchWhere(cb, p, last, searchString));
 
 		if (orderBy != null) {
 			Path<?> field;
@@ -58,25 +58,29 @@ public class ProductDAOImpl extends GenericDAOImpl<Product> implements ProductDA
 	}
 
 	@Override
-	public int quickSearchCount(String searchString) {
+	public int quickSearchCount(Integer last, String searchString) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
 		
 		Root<Product> from = countQuery.from(Product.class);
 		countQuery.select(cb.count(from));
-		countQuery.where(quickSearchWhere(cb, from, searchString));
+		countQuery.where(quickSearchWhere(cb, from, last, searchString));
 		Long count = em.createQuery(countQuery).getSingleResult();		
         return count.intValue();		
 	}
 
-	private Predicate quickSearchWhere(CriteriaBuilder cb, Root<Product> p, String searchString) {
-		String pattern = "%" + searchString.toLowerCase() + "%";		
-		return cb.or(
+	private Predicate quickSearchWhere(CriteriaBuilder cb, Root<Product> p, Integer last, String searchString) {
+		String pattern = "%" + searchString.toLowerCase() + "%";
+		Predicate searchPredicate =  cb.or(
 				cb.like(cb.lower(p.get(Product_.productType).get(ProductType_.name)), pattern),
 				cb.like(cb.lower(p.get(Product_.productType).get(ProductType_.partnum)), pattern),
 				cb.like(cb.lower(p.get(Product_.serial)), pattern),						
 				cb.like(cb.lower(p.get(Product_.notes)), pattern),
 				cb.like(cb.lower(p.get(Product_.supplier)), pattern)					
 			);
+		return (last == null) ?
+				searchPredicate : cb.and(
+						cb.equal(p.get(Product_.last), last.intValue()), 
+						searchPredicate);
 	}
 }

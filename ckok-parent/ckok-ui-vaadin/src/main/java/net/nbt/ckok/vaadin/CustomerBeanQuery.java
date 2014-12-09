@@ -8,6 +8,7 @@ import net.nbt.ckok.service.CkokService;
 import net.nbt.ckok.service.CustomersQuickSearch;
 import net.nbt.ckok.service.CustomersQuickSearchCount;
 import net.nbt.ckok.service.OrderBy;
+import net.nbt.ckok.vaadin.filter.QuickSearchFilter;
 
 import org.vaadin.addons.lazyquerycontainer.AbstractBeanQuery;
 import org.vaadin.addons.lazyquerycontainer.QueryDefinition;

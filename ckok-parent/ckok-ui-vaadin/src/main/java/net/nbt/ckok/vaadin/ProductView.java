@@ -6,6 +6,9 @@ import java.util.ResourceBundle;
 
 import net.nbt.ckok.service.CkokService;
 import net.nbt.ckok.service.GetProductOperations;
+import net.nbt.ckok.vaadin.filter.ProductStateFilter;
+import net.nbt.ckok.vaadin.filter.ProductStateFilter.ProductState;
+import net.nbt.ckok.vaadin.filter.QuickSearchFilter;
 
 import org.vaadin.addons.lazyquerycontainer.BeanQueryFactory;
 import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
@@ -36,6 +39,7 @@ public class ProductView extends VerticalLayout implements View {
 	private final ResourceBundle messages;
 	private final CkokService service;
 	private OpList oplist;
+	private ProductState productState = null;
 
 	public ProductView(CkokService service, ResourceBundle messages) {
 		this.service = service;
@@ -61,6 +65,9 @@ public class ProductView extends VerticalLayout implements View {
 	
 	@Override
 	public void enter(ViewChangeEvent event) {
+		if ("store".equals(event.getParameters())) {
+			productState = ProductState.ON_STORE;
+		}
 	}
 	
 	public void initLayout() {
@@ -104,7 +111,7 @@ public class ProductView extends VerticalLayout implements View {
 		productList.setContainerDataSource(container);
 		productList.setSelectable(true);
 		productList.setImmediate(true);
-
+		productList.setRowHeaderMode(Table.RowHeaderMode.INDEX);
 
 		productList.addValueChangeListener(new Property.ValueChangeListener() {
 			public void valueChange(ValueChangeEvent event) {
@@ -130,8 +137,8 @@ public class ProductView extends VerticalLayout implements View {
 		searchField.addTextChangeListener(new TextChangeListener() {
 			public void textChange(final TextChangeEvent event) {
 				container.removeAllContainerFilters();
-				container.addContainerFilter(new QuickSearchFilter(event
-						.getText()));
+				container.addContainerFilter(new QuickSearchFilter(event.getText()));
+				container.addContainerFilter(new ProductStateFilter(productState));
 				container.refresh();
 			}
 		});

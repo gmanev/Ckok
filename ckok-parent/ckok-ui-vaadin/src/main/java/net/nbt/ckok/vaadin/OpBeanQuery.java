@@ -8,6 +8,7 @@ import net.nbt.ckok.service.CkokService;
 import net.nbt.ckok.service.OrderBy;
 import net.nbt.ckok.service.ProductsQuickSearch;
 import net.nbt.ckok.service.ProductsQuickSearchCount;
+import net.nbt.ckok.vaadin.filter.QuickSearchFilter;
 
 import org.vaadin.addons.lazyquerycontainer.AbstractBeanQuery;
 import org.vaadin.addons.lazyquerycontainer.QueryDefinition;
@@ -51,6 +52,7 @@ public class OpBeanQuery extends AbstractBeanQuery<Operation> {
 				new ProductsQuickSearch(
 						startIndex,
 						count,
+						null,
 						searchString,
 						orderBy);
 	//	return service.productsQuickSearch(parameters).getReturn();
@@ -67,7 +69,7 @@ public class OpBeanQuery extends AbstractBeanQuery<Operation> {
 	public int size() {
 		if (size == -1) {
 			size = service.productsQuickSearchCount(
-					new ProductsQuickSearchCount(searchString)).getCount();
+					new ProductsQuickSearchCount(null, searchString)).getCount();
 		}
 		return size; 
 	}

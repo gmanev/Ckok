@@ -8,12 +8,18 @@ import net.nbt.ckok.service.CkokService;
 import net.nbt.ckok.service.OrderBy;
 import net.nbt.ckok.service.ProductsQuickSearch;
 import net.nbt.ckok.service.ProductsQuickSearchCount;
+import net.nbt.ckok.vaadin.filter.ProductStateFilter;
+import net.nbt.ckok.vaadin.filter.ProductStateFilter.ProductState;
+import net.nbt.ckok.vaadin.filter.QuickSearchFilter;
 
 import org.vaadin.addons.lazyquerycontainer.AbstractBeanQuery;
 import org.vaadin.addons.lazyquerycontainer.QueryDefinition;
 
+import com.vaadin.data.Container.Filter;
+
 public class ProductBeanQuery extends AbstractBeanQuery<Product> {
 
+	private Integer last;
 	private int size = -1;
 	private OrderBy orderBy = null;
 	private String searchString = "";
@@ -34,9 +40,15 @@ public class ProductBeanQuery extends AbstractBeanQuery<Product> {
 			break;
 		}
 		
-		if (definition.getFilters().size() > 0) {
-			QuickSearchFilter filter = (QuickSearchFilter) definition.getFilters().get(0);
-			searchString = filter.getSearchString();
+		for (Filter filter : definition.getFilters()) {
+			if (filter instanceof QuickSearchFilter) {
+				searchString = ((QuickSearchFilter) filter).getSearchString();
+			}
+			else if (filter instanceof ProductStateFilter) {
+				ProductState productState = ((ProductStateFilter) filter).getState();
+				if (productState != null)
+					last = productState.ordinal();
+			}
 		}
 	}
 	
@@ -51,6 +63,7 @@ public class ProductBeanQuery extends AbstractBeanQuery<Product> {
 				new ProductsQuickSearch(
 						startIndex,
 						count,
+						last,
 						searchString,
 						orderBy);
 		return service.productsQuickSearch(parameters).getReturn();
@@ -66,7 +79,7 @@ public class ProductBeanQuery extends AbstractBeanQuery<Product> {
 	public int size() {
 		if (size == -1) {
 			size = service.productsQuickSearchCount(
-					new ProductsQuickSearchCount(searchString)).getCount();
+					new ProductsQuickSearchCount(last, searchString)).getCount();
 		}
 		return size; 
 	}
