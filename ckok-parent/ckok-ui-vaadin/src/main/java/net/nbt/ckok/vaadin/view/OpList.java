@@ -52,6 +52,7 @@ public class OpList {
 				bundle.getString("oplist.n"),
 				bundle.getString("oplist.customer.name"));
 		table.setSizeFull();
+		table.setPageLength(5);
 		table.setRowHeaderMode(Table.RowHeaderMode.INDEX);
 	}
 	
