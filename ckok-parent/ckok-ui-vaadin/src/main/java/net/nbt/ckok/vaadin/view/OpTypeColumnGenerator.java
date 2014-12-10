@@ -1,4 +1,4 @@
-package net.nbt.ckok.vaadin;
+package net.nbt.ckok.vaadin.view;
 
 import java.util.ResourceBundle;
 

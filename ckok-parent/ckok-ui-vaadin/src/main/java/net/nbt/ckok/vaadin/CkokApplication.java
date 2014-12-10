@@ -4,6 +4,9 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 import net.nbt.ckok.service.CkokService;
+import net.nbt.ckok.vaadin.view.CustomerView;
+import net.nbt.ckok.vaadin.view.ProductView;
+import net.nbt.ckok.vaadin.view.StockView;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.data.Item;
@@ -19,14 +22,13 @@ import com.vaadin.ui.UI;
 @Theme("valo")
 public class CkokApplication extends UI {
 
-	private static final String PRODUCTVIEW = "product";
-	private static final String CUSTOMERVIEW = "customer";
 	private static final String[][] menuItems = {
 		{ "customer", null },
 		{ "product", null },
 		{ "store", null },
-		{ "product/store", "store" },
-		{ "store/nomen", "store" }
+		{ "stock", "store" },
+		{ "supply", "store" },
+		{ "nomen", "store" }
 	};
 	
 	private Locale locale;
@@ -58,7 +60,7 @@ public class CkokApplication extends UI {
 		
         setSizeFull();
                 
-		Tree menu = new Tree();
+		final Tree menu = new Tree();
 		menu.setItemCaptionPropertyId("name");
 		menu.getContainerDataSource().addContainerProperty("name", String.class, "");
 		//menu.setStyleName("menu");
@@ -102,8 +104,9 @@ public class CkokApplication extends UI {
 		
 		navigator = new Navigator(this, panel);
 		navigator.setErrorView(new Navigator.EmptyView());
-		navigator.addView(CUSTOMERVIEW, new CustomerView(service, messages));
-		navigator.addView(PRODUCTVIEW, new ProductView(service, messages));
-		navigator.navigateTo(CUSTOMERVIEW);
+		navigator.addView("customer", new CustomerView(service, messages));
+		navigator.addView("product", new ProductView(service, messages));
+		navigator.addView("stock", new StockView(service, messages));		
+		navigator.navigateTo("customer");
 	}
 }

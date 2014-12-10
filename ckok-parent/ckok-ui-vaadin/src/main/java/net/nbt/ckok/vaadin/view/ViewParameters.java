@@ -1,4 +1,4 @@
-package net.nbt.ckok.vaadin;
+package net.nbt.ckok.vaadin.view;
 
 import net.nbt.ckok.vaadin.filter.QuickSearchFilter;
 

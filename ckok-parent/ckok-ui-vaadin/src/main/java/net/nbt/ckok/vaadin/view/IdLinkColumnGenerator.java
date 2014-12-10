@@ -1,4 +1,4 @@
-package net.nbt.ckok.vaadin;
+package net.nbt.ckok.vaadin.view;
 
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Label;

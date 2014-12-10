@@ -1,14 +1,13 @@
-package net.nbt.ckok.vaadin;
+package net.nbt.ckok.vaadin.view;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
 import net.nbt.ckok.service.CkokService;
-import net.nbt.ckok.service.GetProductOperations;
-import net.nbt.ckok.vaadin.filter.ProductStateFilter;
-import net.nbt.ckok.vaadin.filter.ProductStateFilter.ProductState;
+import net.nbt.ckok.vaadin.filter.CustomerFilter;
 import net.nbt.ckok.vaadin.filter.QuickSearchFilter;
+import net.nbt.ckok.vaadin.query.CustomerBeanQuery;
 
 import org.vaadin.addons.lazyquerycontainer.BeanQueryFactory;
 import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
@@ -28,59 +27,59 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.VerticalSplitPanel;
 
-public class ProductView extends VerticalLayout implements View {
+public class CustomerView extends VerticalLayout implements View {
 
+	private final ResourceBundle messages;
+	private final CkokService service;
+
+	private Table customerList = new Table();
 	private TextField searchField = new TextField();
 	private FormLayout editorLayout = new FormLayout();
 	private FieldGroup editorFields = new FieldGroup();
-	private Table productList = new Table();
 	private TabSheet tabsheet = new TabSheet();	
 	private LazyQueryContainer container;
-	private final ResourceBundle messages;
-	private final CkokService service;
 	private OpList oplist;
-	private ProductState productState = null;
 
-	public ProductView(CkokService service, ResourceBundle messages) {
+	private static final Object[] tableFieldNames = new String[] {
+		"name", "notes", "createdOn"
+	};
+
+	private static final Object[] editorFieldNames = new String[] {
+		"name", "notes", "createdOn"		
+	};
+
+	public CustomerView(CkokService service, ResourceBundle messages) {
 		this.service = service;
 		this.messages = messages;
-		oplist = new OpList(messages);
+		oplist = new OpList(service, messages);
 		initLayout();
-		initProductList();
+		initCustomerList();
 		initEditor();
 		initSearch();
 	}
 	
-	private static final Object[] tableFieldNames = new String[] {
-		"productType.name", "productType.partnum",
-		"serial", "supplier", "createdOn", "warranty", "notes"
-	};
-
-	private static final Object[] editorFieldNames = new String[] {
-		"productType.name", "productType.partnum",
-		"serial", "supplier",
-		"createdOn", "warranty",
-		"notes"
-	};
-	
 	@Override
 	public void enter(ViewChangeEvent event) {
-		if ("store".equals(event.getParameters())) {
-			productState = ProductState.ON_STORE;
+		ViewParameters p = new ViewParameters(event.getParameters());
+		if (p.getSearchFilter() != null) {			
+			searchField.setValue(p.getSearchFilter().getSearchString());
+			container.removeAllContainerFilters();
+			container.addContainerFilter(p.getSearchFilter());
+			container.refresh();
 		}
 	}
-	
+
 	public void initLayout() {
 		setSizeFull();
 
-		tabsheet.addTab(editorLayout, messages.getString("product.tab.details"));
+		tabsheet.addTab(editorLayout, messages.getString("customer.tab.details"));
 		tabsheet.addTab(oplist.getTable(), messages.getString("product.tab.history"));
 		
 		VerticalSplitPanel splitPanel = new VerticalSplitPanel();
-		splitPanel.setFirstComponent(productList);
+		splitPanel.setFirstComponent(customerList);
 		splitPanel.setSecondComponent(tabsheet);
 
-		productList.setSizeFull();
+		customerList.setSizeFull();
 		
 		addComponent(searchField);
 		addComponent(splitPanel);
@@ -92,9 +91,9 @@ public class ProductView extends VerticalLayout implements View {
 		setExpandRatio(splitPanel, 1);
 	}
 
-	private void initProductList() {
-		BeanQueryFactory<ProductBeanQuery> queryFactory = new
-				BeanQueryFactory<ProductBeanQuery>(ProductBeanQuery.class);
+	private void initCustomerList() {
+		BeanQueryFactory<CustomerBeanQuery> queryFactory = new
+				BeanQueryFactory<CustomerBeanQuery>(CustomerBeanQuery.class);
 
 		Map<String,Object> queryConfiguration = new HashMap<String,Object>();
 		queryConfiguration.put("service", service);
@@ -105,49 +104,48 @@ public class ProductView extends VerticalLayout implements View {
 
 		for (int i=0; i<tableFieldNames.length; i++) {
 			container.addContainerProperty(tableFieldNames[i], String.class, "", true, true);
-			productList.setColumnHeader(tableFieldNames[i], messages.getString("product." + tableFieldNames[i]));
+			customerList.setColumnHeader(tableFieldNames[i], messages.getString("customer." + tableFieldNames[i]));
 		}
 		
-		productList.setContainerDataSource(container);
-		productList.setSelectable(true);
-		productList.setImmediate(true);
-		productList.setRowHeaderMode(Table.RowHeaderMode.INDEX);
+		customerList.setContainerDataSource(container);
+		customerList.setSelectable(true);
+		customerList.setImmediate(true);
 
-		productList.addValueChangeListener(new Property.ValueChangeListener() {
+		customerList.addValueChangeListener(new Property.ValueChangeListener() {
 			public void valueChange(ValueChangeEvent event) {
-				Object productId = productList.getValue();
-				if (productId != null)
-					editorFields.setItemDataSource(productList
-							.getItem(productId));
+				Object id = customerList.getValue();
+				if (id != null)
+					editorFields.setItemDataSource(customerList
+							.getItem(id));
 
-				if (productId != null) {
-					oplist.getContainer().removeAllItems();
-					oplist.getContainer().addAll(service.getProductOperations(
-							new GetProductOperations(Integer.parseInt(productId.toString()))).getReturn());
+				if (id != null) {
+					oplist.getContainer().removeAllContainerFilters();
+					oplist.getContainer().addContainerFilter(
+							new CustomerFilter(Integer.parseInt(id.toString())));
+					oplist.getContainer().refresh();
 				}
-				
-				tabsheet.setVisible(productId != null);
+		
+				tabsheet.setVisible(id != null);
 			}
 		});
 	}
 
 	private void initSearch() {
-		searchField.setInputPrompt(messages.getString("product.search"));
+		searchField.setInputPrompt(messages.getString("customer.search"));
 		searchField.setTextChangeEventMode(TextChangeEventMode.LAZY);
 		searchField.addTextChangeListener(new TextChangeListener() {
 			public void textChange(final TextChangeEvent event) {
 				container.removeAllContainerFilters();
-				container.addContainerFilter(new QuickSearchFilter(event.getText()));
-				container.addContainerFilter(new ProductStateFilter(productState));
+				container.addContainerFilter(new QuickSearchFilter(event
+						.getText()));
 				container.refresh();
 			}
 		});
 	}
 
-
 	private void initEditor() {
 		for (Object fieldName : editorFieldNames) {
-			TextField field = new TextField(messages.getString("product." + fieldName));
+			TextField field = new TextField(messages.getString("customer." + fieldName));
 			editorLayout.addComponent(field);
 			field.setWidth("50%");
 			field.setNullRepresentation("");
@@ -155,5 +153,4 @@ public class ProductView extends VerticalLayout implements View {
 		}
 		editorFields.setBuffered(true);
 	}
-
 }

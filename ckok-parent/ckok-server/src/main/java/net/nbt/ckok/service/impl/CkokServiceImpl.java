@@ -11,15 +11,15 @@ import net.nbt.ckok.service.CustomersQuickSearchResponse;
 import net.nbt.ckok.service.DeleteProductById;
 import net.nbt.ckok.service.GetAllProducts;
 import net.nbt.ckok.service.GetAllProductsResponse;
-import net.nbt.ckok.service.GetCustomerOperations;
-import net.nbt.ckok.service.GetCustomerOperationsResponse;
 import net.nbt.ckok.service.GetProductById;
 import net.nbt.ckok.service.GetProductByIdResponse;
-import net.nbt.ckok.service.GetProductOperations;
-import net.nbt.ckok.service.GetProductOperationsResponse;
 import net.nbt.ckok.service.GetProducts;
 import net.nbt.ckok.service.GetProductsResponse;
 import net.nbt.ckok.service.NoSuchProductException;
+import net.nbt.ckok.service.OperationsSearch;
+import net.nbt.ckok.service.OperationsSearchCount;
+import net.nbt.ckok.service.OperationsSearchCountResponse;
+import net.nbt.ckok.service.OperationsSearchResponse;
 import net.nbt.ckok.service.ProductsQuickSearch;
 import net.nbt.ckok.service.ProductsQuickSearchCount;
 import net.nbt.ckok.service.ProductsQuickSearchCountResponse;
@@ -98,13 +98,6 @@ public class CkokServiceImpl implements CkokService {
 		return response;
 	}
 
-	public GetProductOperationsResponse getProductOperations(
-			GetProductOperations parameters) {
-		return new GetProductOperationsResponse(
-				operationDAO.getProductOperations(
-						parameters.getProductId()));
-	}
-
 	public CustomersQuickSearchResponse customersQuickSearch(
 			CustomersQuickSearch parameters) {
 		CustomersQuickSearchResponse response = 
@@ -117,18 +110,38 @@ public class CkokServiceImpl implements CkokService {
 		return response;
 	}
 
-	public GetCustomerOperationsResponse getCustomerOperations(
-			GetCustomerOperations parameters) {
-		return new GetCustomerOperationsResponse(
-				operationDAO.getCustomerOperations(
-						parameters.getCustomerId()));
-	}
-
 	public CustomersQuickSearchCountResponse customersQuickSearchCount(
 			CustomersQuickSearchCount parameters) {
 		CustomersQuickSearchCountResponse response = 
 				new CustomersQuickSearchCountResponse();
 		response.setCount(customerDAO.quickSearchCount(
+				parameters.getSearchString()));
+		return response;
+	}
+
+	public OperationsSearchResponse operationsSearch(
+			OperationsSearch parameters) {
+		OperationsSearchResponse response = 
+				new OperationsSearchResponse();
+		response.setReturn(operationDAO.search(
+				parameters.getStartIndex(),
+				parameters.getCount(),
+				parameters.getOptype(),
+				parameters.getProduct(),
+				parameters.getCustomer(),				
+				parameters.getSearchString(),
+				parameters.getOrderBy()));
+		return response;
+	}
+
+	public OperationsSearchCountResponse operationsSearchCount(
+			OperationsSearchCount parameters) {
+		OperationsSearchCountResponse response = 
+				new OperationsSearchCountResponse();
+		response.setCount(operationDAO.searchCount(
+				parameters.getOptype(),
+				parameters.getProduct(),
+				parameters.getCustomer(),
 				parameters.getSearchString()));
 		return response;
 	}
