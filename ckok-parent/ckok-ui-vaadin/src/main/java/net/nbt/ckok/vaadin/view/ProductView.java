@@ -43,7 +43,7 @@ public class ProductView extends VerticalLayout implements View {
 	public ProductView(CkokService service, ResourceBundle messages) {
 		this.service = service;
 		this.messages = messages;
-		oplist = new OpList(service, messages);
+		oplist = new OpList(service);
 		initLayout();
 		initProductList();
 		initEditor();
@@ -70,7 +70,7 @@ public class ProductView extends VerticalLayout implements View {
 		setSizeFull();
 
 		tabsheet.addTab(editorLayout, messages.getString("product.tab.details"));
-		tabsheet.addTab(oplist.getTable(), messages.getString("product.tab.history"));
+		tabsheet.addTab(new OpHistoryTable(oplist, messages), messages.getString("product.tab.history"));
 		
 		VerticalSplitPanel splitPanel = new VerticalSplitPanel();
 		splitPanel.setFirstComponent(productList);
@@ -106,6 +106,8 @@ public class ProductView extends VerticalLayout implements View {
 		}
 		
 		productList.setContainerDataSource(container);
+		productList.setSortContainerPropertyId("createdOn");
+		productList.setSortAscending(false);
 		productList.setSelectable(true);
 		productList.setImmediate(true);
 		productList.setRowHeaderMode(Table.RowHeaderMode.INDEX);

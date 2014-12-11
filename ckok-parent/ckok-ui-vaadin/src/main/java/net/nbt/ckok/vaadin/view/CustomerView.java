@@ -51,7 +51,7 @@ public class CustomerView extends VerticalLayout implements View {
 	public CustomerView(CkokService service, ResourceBundle messages) {
 		this.service = service;
 		this.messages = messages;
-		oplist = new OpList(service, messages);
+		oplist = new OpList(service);
 		initLayout();
 		initCustomerList();
 		initEditor();
@@ -73,7 +73,7 @@ public class CustomerView extends VerticalLayout implements View {
 		setSizeFull();
 
 		tabsheet.addTab(editorLayout, messages.getString("customer.tab.details"));
-		tabsheet.addTab(oplist.getTable(), messages.getString("product.tab.history"));
+		tabsheet.addTab(new OpHistoryTable(oplist, messages), messages.getString("product.tab.history"));
 		
 		VerticalSplitPanel splitPanel = new VerticalSplitPanel();
 		splitPanel.setFirstComponent(customerList);
@@ -106,8 +106,10 @@ public class CustomerView extends VerticalLayout implements View {
 			container.addContainerProperty(tableFieldNames[i], String.class, "", true, true);
 			customerList.setColumnHeader(tableFieldNames[i], messages.getString("customer." + tableFieldNames[i]));
 		}
-		
+
 		customerList.setContainerDataSource(container);
+		customerList.setSortContainerPropertyId("createdOn");
+		customerList.setSortAscending(false);
 		customerList.setSelectable(true);
 		customerList.setImmediate(true);
 
