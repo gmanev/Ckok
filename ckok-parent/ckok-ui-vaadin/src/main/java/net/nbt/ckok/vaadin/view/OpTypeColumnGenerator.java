@@ -15,8 +15,9 @@ public class OpTypeColumnGenerator implements ColumnGenerator {
 	
 	@Override
 	public Object generateCell(Table source, Object itemId, Object columnId) {
-		String optype = source.getContainerProperty(itemId, columnId).getValue().toString();
-		return bundle.getString("optype." + optype);
+		Object value = source.getContainerProperty(itemId, columnId).getValue();
+		return (value == null) ? 
+				null : bundle.getString("optype." + value.toString());
 	}
 
 }

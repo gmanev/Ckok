@@ -51,7 +51,7 @@ public class CustomerView extends VerticalLayout implements View {
 	public CustomerView(CkokService service, ResourceBundle messages) {
 		this.service = service;
 		this.messages = messages;
-		oplist = new OpList(service);
+		oplist = new OpList(service, 50);
 		initLayout();
 		initCustomerList();
 		initEditor();
@@ -60,13 +60,14 @@ public class CustomerView extends VerticalLayout implements View {
 	
 	@Override
 	public void enter(ViewChangeEvent event) {
+		/*
 		ViewParameters p = new ViewParameters(event.getParameters());
 		if (p.getSearchFilter() != null) {			
 			searchField.setValue(p.getSearchFilter().getSearchString());
 			container.removeAllContainerFilters();
 			container.addContainerFilter(p.getSearchFilter());
 			container.refresh();
-		}
+		}*/
 	}
 
 	public void initLayout() {

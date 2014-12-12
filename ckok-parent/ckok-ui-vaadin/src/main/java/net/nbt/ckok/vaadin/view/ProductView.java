@@ -43,7 +43,7 @@ public class ProductView extends VerticalLayout implements View {
 	public ProductView(CkokService service, ResourceBundle messages) {
 		this.service = service;
 		this.messages = messages;
-		oplist = new OpList(service);
+		oplist = new OpList(service, 50);
 		initLayout();
 		initProductList();
 		initEditor();
