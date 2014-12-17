@@ -5,10 +5,12 @@ import java.util.List;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.ListJoin;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 
 import net.nbt.ckok.model.Customer_;
 import net.nbt.ckok.model.Operation;
@@ -16,7 +18,8 @@ import net.nbt.ckok.model.Operation_;
 import net.nbt.ckok.model.Product;
 import net.nbt.ckok.model.Product_;
 import net.nbt.ckok.model.dao.OperationDAO;
-import net.nbt.ckok.service.OrderBy;
+import net.nbt.ckok.service.OperationsSearch;
+import net.nbt.ckok.service.OperationsSearchCount;
 
 public class OperationDAOImpl extends GenericDAOImpl<Operation> implements OperationDAO {
 
@@ -25,24 +28,24 @@ public class OperationDAOImpl extends GenericDAOImpl<Operation> implements Opera
 	}
 
 	@Override
-	public List<Operation> search(int startIndex, int count,
-			Integer optype, Integer product, Integer customer, String searchString, OrderBy orderBy) {
+	public List<Operation> search(OperationsSearch params) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Operation> cq = cb.createQuery(Operation.class);
 
 		Root<Operation> from = cq.from(Operation.class);
-		cq.where(quickSearchWhere(cb, from, optype, product, customer, searchString));
+		cq.where(quickSearchWhere(cb, from, 
+				params.getOptype(), params.getProduct(), params.getCustomer(), params.getSearchString()));
 
-		if (orderBy != null) {
+		if (params.getOrderBy() != null) {
 			Path<?> field;
-			String name = orderBy.getAttributeName();
+			String name = params.getOrderBy().getAttributeName();
 			if (name.equalsIgnoreCase("customer.name")) {
 				field = from.get(Operation_.customer).get(Customer_.name);
 			}
 			else {
 				field = from.get(name);
 			}
-			if (orderBy.isAscending()) {
+			if (params.getOrderBy().isAscending()) {
 				cq.orderBy(cb.asc(field));				
 			}
 			else {
@@ -51,19 +54,20 @@ public class OperationDAOImpl extends GenericDAOImpl<Operation> implements Opera
 		}
 
 		TypedQuery<Operation> typedQuery = em.createQuery(cq);
-		typedQuery.setFirstResult(startIndex);
-		typedQuery.setMaxResults(count);
+		typedQuery.setFirstResult(params.getStartIndex());
+		typedQuery.setMaxResults(params.getCount());
         List<Operation> resultList = typedQuery.getResultList();
         return resultList;
 	}
 
 	@Override
-	public int searchCount(Integer optype, Integer product, Integer customer, String searchString) {
+	public int searchCount(OperationsSearchCount params) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
 		
 		Root<Operation> from = countQuery.from(Operation.class);
-		countQuery.where(quickSearchWhere(cb, from, optype, product, customer, searchString));		
+		countQuery.where(quickSearchWhere(cb, from, 
+				params.getOptype(), params.getProduct(), params.getCustomer(), params.getSearchString()));		
 		countQuery.select(cb.count(from));
 		Long count = em.createQuery(countQuery).getSingleResult();
         return count.intValue();

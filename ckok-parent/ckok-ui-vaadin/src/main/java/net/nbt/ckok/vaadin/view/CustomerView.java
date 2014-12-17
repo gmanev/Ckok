@@ -32,13 +32,14 @@ public class CustomerView extends VerticalLayout implements View {
 	private final ResourceBundle messages;
 	private final CkokService service;
 
-	private Table customerList = new Table();
+	private Table cTable = new Table();
 	private TextField searchField = new TextField();
 	private FormLayout editorLayout = new FormLayout();
 	private FieldGroup editorFields = new FieldGroup();
 	private TabSheet tabsheet = new TabSheet();	
 	private LazyQueryContainer container;
 	private OpList oplist;
+	private OpHistoryTable hTable;
 
 	private static final Object[] tableFieldNames = new String[] {
 		"name", "notes", "createdOn"
@@ -52,6 +53,7 @@ public class CustomerView extends VerticalLayout implements View {
 		this.service = service;
 		this.messages = messages;
 		oplist = new OpList(service, 50);
+		hTable = new OpHistoryTable(messages);
 		initLayout();
 		initCustomerList();
 		initEditor();
@@ -60,6 +62,17 @@ public class CustomerView extends VerticalLayout implements View {
 	
 	@Override
 	public void enter(ViewChangeEvent event) {
+		cTable.setContainerDataSource(container);
+		hTable.setContainerDataSource(oplist.getContainer(), OpHistoryTable.fields);
+		
+		if (cTable.getSortContainerPropertyId() == null) {
+			cTable.setSortContainerPropertyId("createdOn");
+			cTable.setSortAscending(false);
+		}
+		if (hTable.getSortContainerPropertyId() == null) {
+			hTable.setSortContainerPropertyId("id");
+			hTable.setSortAscending(false);
+		}
 		/*
 		ViewParameters p = new ViewParameters(event.getParameters());
 		if (p.getSearchFilter() != null) {			
@@ -74,13 +87,13 @@ public class CustomerView extends VerticalLayout implements View {
 		setSizeFull();
 
 		tabsheet.addTab(editorLayout, messages.getString("customer.tab.details"));
-		tabsheet.addTab(new OpHistoryTable(oplist, messages), messages.getString("product.tab.history"));
+		tabsheet.addTab(hTable, messages.getString("product.tab.history"));
 		
 		VerticalSplitPanel splitPanel = new VerticalSplitPanel();
-		splitPanel.setFirstComponent(customerList);
+		splitPanel.setFirstComponent(cTable);
 		splitPanel.setSecondComponent(tabsheet);
 
-		customerList.setSizeFull();
+		cTable.setSizeFull();
 		
 		addComponent(searchField);
 		addComponent(splitPanel);
@@ -105,20 +118,17 @@ public class CustomerView extends VerticalLayout implements View {
 
 		for (int i=0; i<tableFieldNames.length; i++) {
 			container.addContainerProperty(tableFieldNames[i], String.class, "", true, true);
-			customerList.setColumnHeader(tableFieldNames[i], messages.getString("customer." + tableFieldNames[i]));
+			cTable.setColumnHeader(tableFieldNames[i], messages.getString("customer." + tableFieldNames[i]));
 		}
 
-		customerList.setContainerDataSource(container);
-		customerList.setSortContainerPropertyId("createdOn");
-		customerList.setSortAscending(false);
-		customerList.setSelectable(true);
-		customerList.setImmediate(true);
+		cTable.setSelectable(true);
+		cTable.setImmediate(true);
 
-		customerList.addValueChangeListener(new Property.ValueChangeListener() {
+		cTable.addValueChangeListener(new Property.ValueChangeListener() {
 			public void valueChange(ValueChangeEvent event) {
-				Object id = customerList.getValue();
+				Object id = cTable.getValue();
 				if (id != null)
-					editorFields.setItemDataSource(customerList
+					editorFields.setItemDataSource(cTable
 							.getItem(id));
 
 				if (id != null) {

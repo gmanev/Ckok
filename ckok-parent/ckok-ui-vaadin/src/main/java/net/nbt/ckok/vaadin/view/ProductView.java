@@ -1,16 +1,10 @@
 package net.nbt.ckok.vaadin.view;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 import net.nbt.ckok.service.CkokService;
 import net.nbt.ckok.vaadin.filter.ProductFilter;
 import net.nbt.ckok.vaadin.filter.QuickSearchFilter;
-import net.nbt.ckok.vaadin.query.ProductBeanQuery;
-
-import org.vaadin.addons.lazyquerycontainer.BeanQueryFactory;
-import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -32,28 +26,28 @@ public class ProductView extends VerticalLayout implements View {
 	private TextField searchField = new TextField();
 	private FormLayout editorLayout = new FormLayout();
 	private FieldGroup editorFields = new FieldGroup();
-	private Table productList = new Table();
+	private Table pTable;
+	private Table hTable;	
 	private TabSheet tabsheet = new TabSheet();	
-	protected LazyQueryContainer container;
 	private final ResourceBundle messages;
 	private final CkokService service;
 	private OpList oplist;
+	protected ProductList plist;
 	private QuickSearchFilter filter = new QuickSearchFilter("");
 
 	public ProductView(CkokService service, ResourceBundle messages) {
 		this.service = service;
 		this.messages = messages;
 		oplist = new OpList(service, 50);
+		pTable = new ProductTable(messages);
+		hTable = new OpHistoryTable(messages);
+		plist = new ProductList(service, 50);
+		plist.getContainer().addContainerFilter(filter);
 		initLayout();
 		initProductList();
 		initEditor();
 		initSearch();
 	}
-	
-	private static final Object[] tableFieldNames = new String[] {
-		"productType.name", "productType.partnum",
-		"serial", "supplier", "createdOn", "warranty", "notes"
-	};
 
 	private static final Object[] editorFieldNames = new String[] {
 		"productType.name", "productType.partnum",
@@ -64,20 +58,28 @@ public class ProductView extends VerticalLayout implements View {
 	
 	@Override
 	public void enter(ViewChangeEvent event) {
+		pTable.setContainerDataSource(plist.getContainer(), ProductTable.fields);
+		hTable.setContainerDataSource(oplist.getContainer(), OpHistoryTable.fields);
+		if (pTable.getSortContainerPropertyId() == null) {
+			pTable.setSortContainerPropertyId("createdOn");
+			pTable.setSortAscending(false);
+		}
+		if (hTable.getSortContainerPropertyId() == null) {
+			hTable.setSortContainerPropertyId("id");
+			hTable.setSortAscending(true);
+		}
 	}
 	
 	public void initLayout() {
 		setSizeFull();
 
 		tabsheet.addTab(editorLayout, messages.getString("product.tab.details"));
-		tabsheet.addTab(new OpHistoryTable(oplist, messages), messages.getString("product.tab.history"));
-		
-		VerticalSplitPanel splitPanel = new VerticalSplitPanel();
-		splitPanel.setFirstComponent(productList);
-		splitPanel.setSecondComponent(tabsheet);
+		tabsheet.addTab(hTable, messages.getString("product.tab.history"));
 
-		productList.setSizeFull();
-		
+		VerticalSplitPanel splitPanel = new VerticalSplitPanel();
+		splitPanel.setFirstComponent(pTable);
+		splitPanel.setSecondComponent(tabsheet);
+	
 		addComponent(searchField);
 		addComponent(splitPanel);
 
@@ -89,34 +91,11 @@ public class ProductView extends VerticalLayout implements View {
 	}
 
 	private void initProductList() {
-		BeanQueryFactory<ProductBeanQuery> queryFactory = new
-				BeanQueryFactory<ProductBeanQuery>(ProductBeanQuery.class);
-
-		Map<String,Object> queryConfiguration = new HashMap<String,Object>();
-		queryConfiguration.put("service", service);
-		queryFactory.setQueryConfiguration(queryConfiguration);
-
-		container = new LazyQueryContainer(queryFactory, "id", 50, false);
-		container.getQueryView().getQueryDefinition().setMaxNestedPropertyDepth(1);
-		container.addContainerFilter(filter);
-		
-		for (int i=0; i<tableFieldNames.length; i++) {
-			container.addContainerProperty(tableFieldNames[i], String.class, "", true, true);
-			productList.setColumnHeader(tableFieldNames[i], messages.getString("product." + tableFieldNames[i]));
-		}
-		
-		productList.setContainerDataSource(container);
-		productList.setSortContainerPropertyId("createdOn");
-		productList.setSortAscending(false);
-		productList.setSelectable(true);
-		productList.setImmediate(true);
-		productList.setRowHeaderMode(Table.RowHeaderMode.INDEX);
-
-		productList.addValueChangeListener(new Property.ValueChangeListener() {
+		pTable.addValueChangeListener(new Property.ValueChangeListener() {
 			public void valueChange(ValueChangeEvent event) {
-				Object productId = productList.getValue();
+				Object productId = pTable.getValue();
 				if (productId != null)
-					editorFields.setItemDataSource(productList
+					editorFields.setItemDataSource(pTable
 							.getItem(productId));
 
 				if (productId != null) {
@@ -137,7 +116,7 @@ public class ProductView extends VerticalLayout implements View {
 		searchField.addTextChangeListener(new TextChangeListener() {
 			public void textChange(final TextChangeEvent event) {
 				filter.setSearchString(event.getText());
-				container.refresh();
+				plist.getContainer().refresh();
 			}
 		});
 	}

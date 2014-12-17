@@ -4,10 +4,11 @@ import java.util.List;
 import java.util.Map;
 
 import net.nbt.ckok.model.Product;
-import net.nbt.ckok.service.ProductsQuickSearch;
-import net.nbt.ckok.service.ProductsQuickSearchCount;
+import net.nbt.ckok.service.ProductsSearch;
+import net.nbt.ckok.service.ProductsSearchCount;
 import net.nbt.ckok.vaadin.filter.OpTypeFilter;
 import net.nbt.ckok.vaadin.filter.OpTypeFilter.OpType;
+import net.nbt.ckok.vaadin.filter.OperationFilter;
 import net.nbt.ckok.vaadin.filter.QuickSearchFilter;
 
 import org.vaadin.addons.lazyquerycontainer.QueryDefinition;
@@ -18,6 +19,7 @@ public class ProductBeanQuery extends CkokBeanQuery<Product> {
 
 	private int size = -1;
 	private Integer last;
+	private Integer operationId;
 	private String searchString = "";
 	
 	public ProductBeanQuery(QueryDefinition definition,
@@ -34,6 +36,9 @@ public class ProductBeanQuery extends CkokBeanQuery<Product> {
 				if (optype != null)
 					last = optype.ordinal();
 			}
+			else if (filter instanceof OperationFilter) {
+				operationId = ((OperationFilter) filter).getOperationId();
+			}
 		}
 	}
 	
@@ -44,14 +49,15 @@ public class ProductBeanQuery extends CkokBeanQuery<Product> {
 
 	@Override
 	protected List<Product> loadBeans(int startIndex, int count) {
-		ProductsQuickSearch parameters = 
-				new ProductsQuickSearch(
+		ProductsSearch parameters = 
+				new ProductsSearch(
 						startIndex,
 						count,
 						last,
+						operationId,
 						searchString,
 						getOrderBy());
-		return getService().productsQuickSearch(parameters).getReturn();
+		return getService().productsSearch(parameters).getReturn();
 	}
 
 	@Override
@@ -63,8 +69,7 @@ public class ProductBeanQuery extends CkokBeanQuery<Product> {
 	@Override
 	public int size() {
 		if (size == -1) {
-			size = getService().productsQuickSearchCount(
-					new ProductsQuickSearchCount(last, searchString)).getCount();
+			size = getService().productsSearchCount(new ProductsSearchCount(last, operationId, searchString)).getCount();
 		}
 		return size; 
 	}

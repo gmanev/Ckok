@@ -5,15 +5,20 @@ import java.util.List;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.ListJoin;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 
+import net.nbt.ckok.model.Operation;
+import net.nbt.ckok.model.Operation_;
 import net.nbt.ckok.model.Product;
 import net.nbt.ckok.model.ProductType_;
 import net.nbt.ckok.model.Product_;
 import net.nbt.ckok.model.dao.ProductDAO;
-import net.nbt.ckok.service.OrderBy;
+import net.nbt.ckok.service.ProductsSearch;
+import net.nbt.ckok.service.ProductsSearchCount;
 
 public class ProductDAOImpl extends GenericDAOImpl<Product> implements ProductDAO  {
 	
@@ -22,18 +27,30 @@ public class ProductDAOImpl extends GenericDAOImpl<Product> implements ProductDA
 	}
 
 	@Override
-	public List<Product> quickSearch(int startIndex, int count, Integer last, String searchString, OrderBy orderBy) {
+	public List<Product> search(ProductsSearch params) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Product> q = cb.createQuery(Product.class);
 
 		Root<Product> p = q.from(Product.class);
 		CriteriaQuery<Product> select = q.select(p);
 
-		select.where(quickSearchWhere(cb, p, last, searchString));
+		if (params.getOperation() != null) {
+			Subquery<Integer> sq = select.subquery(Integer.class);
+			Root<Operation> operation = sq.from(Operation.class);
+			ListJoin<Operation, Product> sqProd = operation.join(Operation_.products);
+			sq.select(sqProd.get(Product_.id)).where(
+					cb.equal(operation.get(Operation_.id), params.getOperation()));
+			select.where(cb.in(p.get(Product_.id)).value(sq));
+		}
+		else {
+			select.where(quickSearchWhere(cb, p, 
+					params.getLast(), params.getSearchString()));
+		}
 
-		if (orderBy != null) {
+
+		if (params.getOrderBy() != null) {
 			Path<?> field;
-			String name = orderBy.getAttributeName();
+			String name = params.getOrderBy().getAttributeName();
 			if (name.equalsIgnoreCase("productType.name")) {
 				field = p.get(Product_.productType).get(ProductType_.name);
 			}
@@ -43,7 +60,7 @@ public class ProductDAOImpl extends GenericDAOImpl<Product> implements ProductDA
 			else {
 				field = p.get(name);
 			}
-			if (orderBy.isAscending()) {
+			if (params.getOrderBy().isAscending()) {
 				select.orderBy(cb.asc(field));				
 			}
 			else {
@@ -52,19 +69,32 @@ public class ProductDAOImpl extends GenericDAOImpl<Product> implements ProductDA
 		}
 
 		TypedQuery<Product> typedQuery = em.createQuery(select);
-		typedQuery.setFirstResult(startIndex);
-		typedQuery.setMaxResults(count);
+		typedQuery.setFirstResult(params.getStartIndex());
+		typedQuery.setMaxResults(params.getCount());
         return typedQuery.getResultList();
 	}
 
 	@Override
-	public int quickSearchCount(Integer last, String searchString) {
+	public int searchCount(ProductsSearchCount params) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
 		
 		Root<Product> from = countQuery.from(Product.class);
 		countQuery.select(cb.count(from));
-		countQuery.where(quickSearchWhere(cb, from, last, searchString));
+
+		if (params.getOperation() != null) {
+			Subquery<Integer> sq = countQuery.subquery(Integer.class);
+			Root<Operation> operation = sq.from(Operation.class);
+			ListJoin<Operation, Product> sqProd = operation.join(Operation_.products);
+			sq.select(sqProd.get(Product_.id)).where(
+					cb.equal(operation.get(Operation_.id), params.getOperation()));
+			countQuery.where(cb.in(from.get(Product_.id)).value(sq));
+		}
+		else {
+			countQuery.where(quickSearchWhere(cb, from, 
+				params.getLast(), params.getSearchString()));
+		}
+
 		Long count = em.createQuery(countQuery).getSingleResult();		
         return count.intValue();		
 	}

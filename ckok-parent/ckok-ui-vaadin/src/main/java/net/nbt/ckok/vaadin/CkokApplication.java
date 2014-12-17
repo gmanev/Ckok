@@ -5,6 +5,7 @@ import java.util.ResourceBundle;
 
 import net.nbt.ckok.service.CkokService;
 import net.nbt.ckok.vaadin.view.CustomerView;
+import net.nbt.ckok.vaadin.view.EvalView;
 import net.nbt.ckok.vaadin.view.ProductView;
 import net.nbt.ckok.vaadin.view.StockView;
 import net.nbt.ckok.vaadin.view.SupplyView;
@@ -28,6 +29,7 @@ public class CkokApplication extends UI {
 		{ "product", null },
 		{ "store", null },
 		{ "stock", "store" },
+		{ "eval", "store" },		
 		{ "supply", "store" },
 		{ "nomen", "store" }
 	};
@@ -107,8 +109,8 @@ public class CkokApplication extends UI {
 		navigator.setErrorView(new Navigator.EmptyView());
 		navigator.addView("customer", new CustomerView(service, messages));
 		navigator.addView("product", new ProductView(service, messages));
-		navigator.addView("stock", new StockView(service, messages));
-		navigator.addView("supply", new SupplyView(service, messages));
-		navigator.navigateTo("customer");
+		//navigator.addView("stock", new StockView(service, messages));
+		//navigator.addView("supply", new SupplyView(service, messages));
+		//navigator.addView("eval", new EvalView(service, messages));		
 	}
 }
