@@ -4,11 +4,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import com.vaadin.data.Container;
 import com.vaadin.ui.Table;
 
 public class OpHistoryTable extends Table {
 
-	public static final List<String> fields = Arrays.asList(
+	private static final List<String> fields = Arrays.asList(
 		"ts", "optype", "n", "customer.name"
 	);
 
@@ -21,4 +22,11 @@ public class OpHistoryTable extends Table {
 		setPageLength(5);
 	}
 
+	public void setDataSource(Container newDataSource) {
+		super.setContainerDataSource(newDataSource, fields);
+		if (getSortContainerPropertyId() == null) {
+			setSortContainerPropertyId("id");
+			setSortAscending(false);
+		}
+	}
 }

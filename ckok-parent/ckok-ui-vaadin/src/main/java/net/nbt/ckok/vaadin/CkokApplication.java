@@ -109,8 +109,8 @@ public class CkokApplication extends UI {
 		navigator.setErrorView(new Navigator.EmptyView());
 		navigator.addView("customer", new CustomerView(service, messages));
 		navigator.addView("product", new ProductView(service, messages));
-		//navigator.addView("stock", new StockView(service, messages));
-		//navigator.addView("supply", new SupplyView(service, messages));
-		//navigator.addView("eval", new EvalView(service, messages));		
+		navigator.addView("stock", new StockView(service, messages));
+		navigator.addView("supply", new SupplyView(service, messages));
+		navigator.addView("eval", new EvalView(service, messages));		
 	}
 }

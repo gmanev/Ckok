@@ -16,7 +16,6 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.AbstractTextField.TextChangeEventMode;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.VerticalSplitPanel;
@@ -26,8 +25,8 @@ public class ProductView extends VerticalLayout implements View {
 	private TextField searchField = new TextField();
 	private FormLayout editorLayout = new FormLayout();
 	private FieldGroup editorFields = new FieldGroup();
-	private Table pTable;
-	private Table hTable;	
+	private ProductTable pTable;
+	private OpHistoryTable hTable;	
 	private TabSheet tabsheet = new TabSheet();	
 	private final ResourceBundle messages;
 	private final CkokService service;
@@ -58,16 +57,8 @@ public class ProductView extends VerticalLayout implements View {
 	
 	@Override
 	public void enter(ViewChangeEvent event) {
-		pTable.setContainerDataSource(plist.getContainer(), ProductTable.fields);
-		hTable.setContainerDataSource(oplist.getContainer(), OpHistoryTable.fields);
-		if (pTable.getSortContainerPropertyId() == null) {
-			pTable.setSortContainerPropertyId("createdOn");
-			pTable.setSortAscending(false);
-		}
-		if (hTable.getSortContainerPropertyId() == null) {
-			hTable.setSortContainerPropertyId("id");
-			hTable.setSortAscending(true);
-		}
+		pTable.setDataSource(plist.getContainer());
+		hTable.setDataSource(oplist.getContainer());
 	}
 	
 	public void initLayout() {

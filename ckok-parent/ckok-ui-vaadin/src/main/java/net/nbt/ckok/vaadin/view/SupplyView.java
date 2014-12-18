@@ -51,14 +51,13 @@ public class SupplyView extends VerticalLayout implements View {
 
 	@Override
 	public void enter(ViewChangeEvent event) {
-		opTable.setContainerDataSource(opList.getContainer(), OpHistoryTable.fields);
-		spTable.setContainerDataSource(plist.getContainer(), SupplyProductTable.fields);
+		opTable.setDataSource(opList.getContainer());
+		spTable.setDataSource(plist.getContainer());
 	}
 
 	private void initLayout() {
 		setSizeFull();
 
-		tabsheet.setVisible(false);
 		tabsheet.addTab(spTable, bundle.getString("product.tab.details"));
 
 		VerticalSplitPanel splitPanel = new VerticalSplitPanel();

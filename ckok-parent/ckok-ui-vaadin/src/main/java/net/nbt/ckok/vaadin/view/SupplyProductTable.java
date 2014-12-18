@@ -4,13 +4,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import com.vaadin.data.Container;
 import com.vaadin.ui.Table;
 
 public class SupplyProductTable extends Table {
 
-	public static final List<String> fields = Arrays.asList(
+	private static final List<String> fields = Arrays.asList(
 		"productType.name", "productType.partnum",
-		"serial", "supplier", "createdOn", "warranty", "notes"
+		"serial", "supplier", "createdOn", "notes"
 	);
 	
 	public SupplyProductTable(ResourceBundle bundle) {
@@ -18,10 +19,15 @@ public class SupplyProductTable extends Table {
 			setColumnHeader(field, bundle.getString("product." + field));
 		}
 		setSizeFull();
-		setSortContainerPropertyId("createdOn");
-		setSortAscending(false);
 		setPageLength(5);
 		setRowHeaderMode(Table.RowHeaderMode.INDEX);		
 	}
 
+	public void setDataSource(Container newDataSource) {
+		super.setContainerDataSource(newDataSource, fields);
+		if (getSortContainerPropertyId() == null) {
+			setSortContainerPropertyId("createdOn");
+			setSortAscending(false);
+		}
+	}
 }

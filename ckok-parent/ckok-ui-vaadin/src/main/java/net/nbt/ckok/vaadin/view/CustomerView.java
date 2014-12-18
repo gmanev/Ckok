@@ -63,15 +63,11 @@ public class CustomerView extends VerticalLayout implements View {
 	@Override
 	public void enter(ViewChangeEvent event) {
 		cTable.setContainerDataSource(container);
-		hTable.setContainerDataSource(oplist.getContainer(), OpHistoryTable.fields);
+		hTable.setDataSource(oplist.getContainer());
 		
 		if (cTable.getSortContainerPropertyId() == null) {
 			cTable.setSortContainerPropertyId("createdOn");
 			cTable.setSortAscending(false);
-		}
-		if (hTable.getSortContainerPropertyId() == null) {
-			hTable.setSortContainerPropertyId("id");
-			hTable.setSortAscending(false);
 		}
 		/*
 		ViewParameters p = new ViewParameters(event.getParameters());

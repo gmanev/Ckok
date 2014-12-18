@@ -4,11 +4,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import com.vaadin.data.Container;
 import com.vaadin.ui.Table;
 
 public class SupplyTable extends Table {
 
-	public static final List<String> fields = Arrays.asList("ts", "n", "notes");
+	private static final List<String> fields = Arrays.asList("ts", "n", "notes");
 	
 	public SupplyTable(ResourceBundle bundle) {
 		for (String s : fields) {
@@ -16,8 +17,13 @@ public class SupplyTable extends Table {
 		}
 		setSizeFull();
 		setSelectable(true);
-		setSortAscending(false);
-		setSortContainerPropertyId("ts");
 	}
 
+	public void setDataSource(Container newDataSource) {
+		super.setContainerDataSource(newDataSource, fields);
+		if (getSortContainerPropertyId() == null) {
+			setSortContainerPropertyId("ts");
+			setSortAscending(false);
+		}
+	}
 }
