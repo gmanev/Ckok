@@ -84,6 +84,36 @@
 				</xsd:sequence>
 			</xsd:complexType>
 			<!-- ... -->
+			<xsd:element name="getProductDetailCount" type="tns:getProductDetailCount" />
+			<xsd:complexType name="getProductDetailCount">
+				<xsd:sequence>
+					<xsd:element minOccurs="0" name="last" type="xsd:int" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:element name="getProductDetailCountResponse" type="tns:getProductDetailCountResponse" />
+			<xsd:complexType name="getProductDetailCountResponse">
+				<xsd:sequence>
+					<xsd:element minOccurs="0" name="count" type="xsd:int" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<!-- ... -->
+			<xsd:element name="getProductDetail" type="tns:getProductDetail" />
+			<xsd:complexType name="getProductDetail">
+				<xsd:sequence>
+					<xsd:element minOccurs="0" name="startIndex" type="xsd:int" />
+					<xsd:element minOccurs="0" name="count" type="xsd:int" />
+					<xsd:element minOccurs="0" name="last" type="xsd:int" />
+					<xsd:element minOccurs="0" name="orderBy" type="tns:orderBy" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:element name="getProductDetailResponse" type="tns:getProductDetailResponse" />
+			<xsd:complexType name="getProductDetailResponse">
+				<xsd:sequence>
+					<xsd:element minOccurs="0" maxOccurs="unbounded" name="return"
+						type="cns:ProductDetail" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<!-- ... -->
 			<xsd:element name="getProductById" type="tns:getProductById" />
 			<xsd:complexType name="getProductById">
 				<xsd:sequence>
@@ -97,18 +127,6 @@
 				</xsd:sequence>
 			</xsd:complexType>
 			<!-- ... -->
-			<xsd:element name="getAllProducts" type="tns:getAllProducts" />
-			<xsd:complexType name="getAllProducts">
-				<xsd:sequence>
-				</xsd:sequence>
-			</xsd:complexType>
-			<xsd:element name="getAllProductsResponse" type="tns:getAllProductsResponse" />
-			<xsd:complexType name="getAllProductsResponse">
-				<xsd:sequence>
-					<xsd:element minOccurs="0" maxOccurs="unbounded" name="return"
-						type="cns:Product" />
-				</xsd:sequence>
-			</xsd:complexType>
 			<xsd:element name="updateProduct" type="tns:updateProduct" />
 			<xsd:complexType name="updateProduct">
 				<xsd:sequence>
@@ -133,23 +151,6 @@
 			<xsd:complexType name="NoSuchProduct">
 				<xsd:sequence>
 					<xsd:element name="productId" nillable="true" type="xsd:int" />
-				</xsd:sequence>
-			</xsd:complexType>
-			<!-- ... -->
-			<xsd:element name="getProducts" type="tns:getProducts" />
-			<xsd:complexType name="getProducts">
-				<xsd:sequence>
-					<xsd:element minOccurs="0" name="startIndex" type="xsd:int" />
-					<xsd:element minOccurs="0" name="count" type="xsd:int" />
-					<xsd:element minOccurs="0" name="filter" type="tns:queryFilter" />
-					<xsd:element minOccurs="0" maxOccurs="unbounded" name="sort" type="tns:orderBy" />
-				</xsd:sequence>
-			</xsd:complexType>
-			<xsd:element name="getProductsResponse" type="tns:getProductsResponse" />
-			<xsd:complexType name="getProductsResponse">
-				<xsd:sequence>
-					<xsd:element minOccurs="0" maxOccurs="unbounded" name="return"
-						type="cns:Product" />
 				</xsd:sequence>
 			</xsd:complexType>
 			<!-- ... -->
@@ -264,23 +265,25 @@
 		<wsdl:part name="parameters" element="tns:productsSearchResponse" />
 	</wsdl:message>
 
-	<wsdl:message name="getProducts">
-		<wsdl:part name="parameters" element="tns:getProducts" />
+	<wsdl:message name="getProductDetailCount">
+		<wsdl:part name="parameters" element="tns:getProductDetailCount" />
 	</wsdl:message>
-	<wsdl:message name="getProductsResponse">
-		<wsdl:part name="parameters" element="tns:getProductsResponse" />
+	<wsdl:message name="getProductDetailCountResponse">
+		<wsdl:part name="parameters" element="tns:getProductDetailCountResponse" />
 	</wsdl:message>
+
+	<wsdl:message name="getProductDetail">
+		<wsdl:part name="parameters" element="tns:getProductDetail" />
+	</wsdl:message>
+	<wsdl:message name="getProductDetailResponse">
+		<wsdl:part name="parameters" element="tns:getProductDetailResponse" />
+	</wsdl:message>
+
 	<wsdl:message name="getProductById">
 		<wsdl:part name="parameters" element="tns:getProductById" />
 	</wsdl:message>
 	<wsdl:message name="getProductByIdResponse">
 		<wsdl:part name="parameters" element="tns:getProductByIdResponse" />
-	</wsdl:message>
-	<wsdl:message name="getAllProducts">
-		<wsdl:part name="parameters" element="tns:getAllProducts" />
-	</wsdl:message>
-	<wsdl:message name="getAllProductsResponse">
-		<wsdl:part name="parameters" element="tns:getAllProductsResponse" />
 	</wsdl:message>
 	<wsdl:message name="updateProduct">
 		<wsdl:part name="parameters" element="tns:updateProduct" />
@@ -309,10 +312,6 @@
 			<wsdl:output name="getProductByIdResponse" message="tns:getProductByIdResponse" />
 			<wsdl:fault name="NoSuchProductException" message="tns:NoSuchProductException" />
 		</wsdl:operation>
-		<wsdl:operation name="getAllProducts">
-			<wsdl:input name="getAllProducts" message="tns:getAllProducts" />
-			<wsdl:output name="getAllProductsResponse" message="tns:getAllProductsResponse" />
-		</wsdl:operation>
 		<wsdl:operation name="productsSearchCount">
 			<wsdl:input name="productsSearchCount" message="tns:productsSearchCount" />
 			<wsdl:output name="productsSearchCountResponse" message="tns:productsSearchCountResponse" />
@@ -321,10 +320,16 @@
 			<wsdl:input name="productsSearch" message="tns:productsSearch" />
 			<wsdl:output name="productsSearchResponse" message="tns:productsSearchResponse" />
 		</wsdl:operation>
-		<wsdl:operation name="getProducts">
-			<wsdl:input name="getProducts" message="tns:getProducts" />
-			<wsdl:output name="getProductsResponse" message="tns:getProductsResponse" />
+		<!-- ... -->
+		<wsdl:operation name="getProductDetailCount">
+			<wsdl:input name="getProductDetailCount" message="tns:getProductDetailCount" />
+			<wsdl:output name="getProductDetailCountResponse" message="tns:getProductDetailCountResponse" />
 		</wsdl:operation>
+		<wsdl:operation name="getProductDetail">
+			<wsdl:input name="getProductDetail" message="tns:getProductDetail" />
+			<wsdl:output name="getProductDetailResponse" message="tns:getProductDetailResponse" />
+		</wsdl:operation>
+		<!-- ... -->
 		<wsdl:operation name="customersQuickSearchCount">
 			<wsdl:input name="customersQuickSearchCount" message="tns:customersQuickSearchCount" />
 			<wsdl:output name="customersQuickSearchCountResponse" message="tns:customersQuickSearchCountResponse" />
@@ -377,16 +382,6 @@
 			</wsdl:fault>
 		</wsdl:operation>
 
-		<wsdl:operation name="getAllProducts">
-			<soap:operation soapAction="" style="document" />
-			<wsdl:input name="getAllProducts">
-				<soap:body use="literal" />
-			</wsdl:input>
-			<wsdl:output name="getAllProductsResponse">
-				<soap:body use="literal" />
-			</wsdl:output>
-		</wsdl:operation>
-
 		<wsdl:operation name="productsSearchCount">
 			<soap:operation soapAction="" style="document" />
 			<wsdl:input name="productsSearchCount">
@@ -407,15 +402,26 @@
 			</wsdl:output>
 		</wsdl:operation>
 
-		<wsdl:operation name="getProducts">
+		<wsdl:operation name="getProductDetailCount">
 			<soap:operation soapAction="" style="document" />
-			<wsdl:input name="getProducts">
+			<wsdl:input name="getProductDetailCount">
 				<soap:body use="literal" />
 			</wsdl:input>
-			<wsdl:output name="getProductsResponse">
+			<wsdl:output name="getProductDetailCountResponse">
 				<soap:body use="literal" />
 			</wsdl:output>
 		</wsdl:operation>
+
+		<wsdl:operation name="getProductDetail">
+			<soap:operation soapAction="" style="document" />
+			<wsdl:input name="getProductDetail">
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="getProductDetailResponse">
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+
 
 		<wsdl:operation name="customersQuickSearchCount">
 			<soap:operation soapAction="" style="document" />

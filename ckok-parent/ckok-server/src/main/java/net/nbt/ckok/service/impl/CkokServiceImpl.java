@@ -9,12 +9,12 @@ import net.nbt.ckok.service.CustomersQuickSearchCount;
 import net.nbt.ckok.service.CustomersQuickSearchCountResponse;
 import net.nbt.ckok.service.CustomersQuickSearchResponse;
 import net.nbt.ckok.service.DeleteProductById;
-import net.nbt.ckok.service.GetAllProducts;
-import net.nbt.ckok.service.GetAllProductsResponse;
 import net.nbt.ckok.service.GetProductById;
 import net.nbt.ckok.service.GetProductByIdResponse;
-import net.nbt.ckok.service.GetProducts;
-import net.nbt.ckok.service.GetProductsResponse;
+import net.nbt.ckok.service.GetProductDetail;
+import net.nbt.ckok.service.GetProductDetailCount;
+import net.nbt.ckok.service.GetProductDetailCountResponse;
+import net.nbt.ckok.service.GetProductDetailResponse;
 import net.nbt.ckok.service.NoSuchProductException;
 import net.nbt.ckok.service.OperationsSearch;
 import net.nbt.ckok.service.OperationsSearchCount;
@@ -63,18 +63,6 @@ public class CkokServiceImpl implements CkokService {
 		return response;
 	}
 
-	public GetAllProductsResponse getAllProducts(GetAllProducts parameters) {
-		GetAllProductsResponse response = new GetAllProductsResponse();
-		response.setReturn(productDAO.getAll());
-		return response;
-	}
-
-	public GetProductsResponse getProducts(GetProducts parameters) {
-		GetProductsResponse r = new GetProductsResponse();
-		r.setReturn(productDAO.get(parameters.getStartIndex(), parameters.getCount(), parameters.getFilter(), parameters.getSort()));
-		return r;
-	}
-
 	public ProductsSearchResponse productsSearch(ProductsSearch parameters) {
 		ProductsSearchResponse response = new ProductsSearchResponse();
 		response.setReturn(productDAO.search(parameters));
@@ -115,6 +103,19 @@ public class CkokServiceImpl implements CkokService {
 	public OperationsSearchCountResponse operationsSearchCount(OperationsSearchCount parameters) {
 		OperationsSearchCountResponse response = new OperationsSearchCountResponse();
 		response.setCount(operationDAO.searchCount(parameters));
+		return response;
+	}
+
+	public GetProductDetailResponse getProductDetail(GetProductDetail parameters) {
+		GetProductDetailResponse response = new GetProductDetailResponse();
+		response.setReturn(productDAO.getProductDetail(parameters));
+		return response;
+	}
+
+	public GetProductDetailCountResponse getProductDetailCount(
+			GetProductDetailCount parameters) {
+		GetProductDetailCountResponse response = new GetProductDetailCountResponse();
+		response.setCount(productDAO.getProductDetailCount(parameters));
 		return response;
 	}
 

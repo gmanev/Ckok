@@ -154,6 +154,11 @@
 				</hj:many-to-many>
 			</jaxb:bindings>
 		</jaxb:bindings>
-		
+
+		<!-- ProductOperation -->
+		<jaxb:bindings node="xsd:complexType[@name='ProductDetail']">
+			<hj:ignored/>
+		</jaxb:bindings>
+
 	</jaxb:bindings>
 </jaxb:bindings>
