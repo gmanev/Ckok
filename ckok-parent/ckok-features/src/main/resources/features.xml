@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<features>
+<features name="ckok-${pom.version}">
 
     <feature name="ckok" version="${pom.version}">
     	<feature>cxf-tools</feature>

@@ -24,26 +24,24 @@ public class CustomerDAOImpl extends GenericDAOImpl<Customer> implements Custome
 	public List<Customer> quickSearch(int startIndex, int count,
 			String searchString, OrderBy orderBy) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
-		CriteriaQuery<Customer> q = cb.createQuery(Customer.class);
+		CriteriaQuery<Customer> cq = cb.createQuery(Customer.class);
 
-		Root<Customer> p = q.from(Customer.class);
-		CriteriaQuery<Customer> select = q.select(p);
-
-		select.where(quickSearchWhere(cb, p, searchString));
+		Root<Customer> p = cq.from(Customer.class);
+		cq.where(quickSearchWhere(cb, p, searchString));
 
 		if (orderBy != null) {
 			Path<?> field;
 			String name = orderBy.getAttributeName();
 			field = p.get(name);
 			if (orderBy.isAscending()) {
-				select.orderBy(cb.asc(field));				
+				cq.orderBy(cb.asc(field));	
 			}
 			else {
-				select.orderBy(cb.desc(field));
+				cq.orderBy(cb.desc(field));
 			}
 		}
 
-		TypedQuery<Customer> typedQuery = em.createQuery(select);
+		TypedQuery<Customer> typedQuery = em.createQuery(cq);
 		typedQuery.setFirstResult(startIndex);
 		typedQuery.setMaxResults(count);
         return typedQuery.getResultList();

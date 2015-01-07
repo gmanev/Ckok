@@ -26,7 +26,7 @@ public class ProductView extends VerticalLayout implements View {
 	private FormLayout editorLayout = new FormLayout();
 	private FieldGroup editorFields = new FieldGroup();
 	private ProductTable pTable;
-	private OpHistoryTable hTable;	
+	private OpHistoryTable hTable;
 	private TabSheet tabsheet = new TabSheet();	
 	private final ResourceBundle messages;
 	private final CkokService service;

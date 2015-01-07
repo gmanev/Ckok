@@ -31,7 +31,11 @@ public class EvalTable extends Table {
 	}
 
 	public void setDataSource(Container newDataSource) {
-		super.setContainerDataSource(newDataSource, fields);
+		if (getContainerDataSource() != newDataSource) {
+			super.setContainerDataSource(newDataSource, fields);
+			setConverter("opTs", new CustomStringToDateConverter());
+			setConverter("opTs2", new CustomStringToDateConverter());
+		}
 	}
 
 }

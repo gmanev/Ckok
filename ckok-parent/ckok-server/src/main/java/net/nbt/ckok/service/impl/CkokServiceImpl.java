@@ -1,8 +1,13 @@
 package net.nbt.ckok.service.impl;
 
+import java.util.List;
+
+import net.nbt.ckok.model.ProductDetail;
+import net.nbt.ckok.model.ProductType;
 import net.nbt.ckok.model.dao.CustomerDAO;
 import net.nbt.ckok.model.dao.OperationDAO;
 import net.nbt.ckok.model.dao.ProductDAO;
+import net.nbt.ckok.model.dao.ProductTypeDAO;
 import net.nbt.ckok.service.CkokService;
 import net.nbt.ckok.service.CustomersQuickSearch;
 import net.nbt.ckok.service.CustomersQuickSearchCount;
@@ -15,6 +20,10 @@ import net.nbt.ckok.service.GetProductDetail;
 import net.nbt.ckok.service.GetProductDetailCount;
 import net.nbt.ckok.service.GetProductDetailCountResponse;
 import net.nbt.ckok.service.GetProductDetailResponse;
+import net.nbt.ckok.service.GetProductTypes;
+import net.nbt.ckok.service.GetProductTypesCount;
+import net.nbt.ckok.service.GetProductTypesCountResponse;
+import net.nbt.ckok.service.GetProductTypesResponse;
 import net.nbt.ckok.service.NoSuchProductException;
 import net.nbt.ckok.service.OperationsSearch;
 import net.nbt.ckok.service.OperationsSearchCount;
@@ -32,6 +41,7 @@ public class CkokServiceImpl implements CkokService {
 	private ProductDAO productDAO;
 	private OperationDAO operationDAO;
 	private CustomerDAO customerDAO;
+	private ProductTypeDAO productTypeDAO;
 	
 	public void setOperationDAO(OperationDAO dao) {
 		this.operationDAO = dao;
@@ -43,6 +53,10 @@ public class CkokServiceImpl implements CkokService {
 
 	public void setCustomerDAO(CustomerDAO dao) {
 		this.customerDAO = dao;
+	}
+
+	public void setProductTypeDAO(ProductTypeDAO dao) {
+		this.productTypeDAO = dao;
 	}
 
 	public void deleteProductById(DeleteProductById parameters) {
@@ -107,16 +121,25 @@ public class CkokServiceImpl implements CkokService {
 	}
 
 	public GetProductDetailResponse getProductDetail(GetProductDetail parameters) {
-		GetProductDetailResponse response = new GetProductDetailResponse();
-		response.setReturn(productDAO.getProductDetail(parameters));
-		return response;
+		List<ProductDetail> list = productDAO.getProductDetail(parameters);
+		return new GetProductDetailResponse(list);
 	}
 
 	public GetProductDetailCountResponse getProductDetailCount(
 			GetProductDetailCount parameters) {
-		GetProductDetailCountResponse response = new GetProductDetailCountResponse();
-		response.setCount(productDAO.getProductDetailCount(parameters));
-		return response;
+		int count = productDAO.getProductDetailCount(parameters);
+		return new GetProductDetailCountResponse(count);
+	}
+
+	public GetProductTypesCountResponse getProductTypesCount(
+			GetProductTypesCount parameters) {
+		int count = productTypeDAO.getProductTypesCount(parameters);
+		return new GetProductTypesCountResponse(count);
+	}
+
+	public GetProductTypesResponse getProductTypes(GetProductTypes parameters) {
+		List<ProductType> list = productTypeDAO.getProductTypes(parameters);
+		return new GetProductTypesResponse(list);
 	}
 
 }

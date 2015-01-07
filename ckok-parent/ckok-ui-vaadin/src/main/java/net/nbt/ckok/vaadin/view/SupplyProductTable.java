@@ -24,10 +24,13 @@ public class SupplyProductTable extends Table {
 	}
 
 	public void setDataSource(Container newDataSource) {
-		super.setContainerDataSource(newDataSource, fields);
-		if (getSortContainerPropertyId() == null) {
-			setSortContainerPropertyId("createdOn");
-			setSortAscending(false);
+		if (getContainerDataSource() != newDataSource) {
+			super.setContainerDataSource(newDataSource, fields);
+			if (getSortContainerPropertyId() == null) {
+				setSortContainerPropertyId("createdOn");
+				setSortAscending(false);
+			}
+			setConverter("createdOn", new CustomStringToDateConverter());
 		}
 	}
 }

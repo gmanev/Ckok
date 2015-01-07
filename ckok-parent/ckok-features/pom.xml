@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>net.nbt.ckok</groupId>
 		<artifactId>ckok-parent</artifactId>
-		<version>0.0.3-SNAPSHOT</version>
+		<version>0.0.4-SNAPSHOT</version>
 	</parent>
 	<artifactId>ckok-features</artifactId>
 	<packaging>pom</packaging>

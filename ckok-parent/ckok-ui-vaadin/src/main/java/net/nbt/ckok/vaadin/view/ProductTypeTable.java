@@ -7,13 +7,13 @@ import java.util.ResourceBundle;
 import com.vaadin.data.Container;
 import com.vaadin.ui.Table;
 
-public class SupplyTable extends Table {
+public class ProductTypeTable extends Table {
 
-	private static final List<String> fields = Arrays.asList("ts", "n", "notes");
+	private static final List<String> fields = Arrays.asList("partnum", "name", "measure");
 	
-	public SupplyTable(ResourceBundle bundle) {
+	public ProductTypeTable(ResourceBundle bundle) {
 		for (String s : fields) {
-			setColumnHeader(s, bundle.getString("oplist." + s));
+			setColumnHeader(s, bundle.getString("productType." + s));
 		}
 		setSizeFull();
 		setSelectable(true);
@@ -23,10 +23,10 @@ public class SupplyTable extends Table {
 		if (getContainerDataSource() != newDataSource) {
 			super.setContainerDataSource(newDataSource, fields);
 			if (getSortContainerPropertyId() == null) {
-				setSortContainerPropertyId("ts");
+				setSortContainerPropertyId("name");
 				setSortAscending(false);
 			}
-			setConverter("ts", new CustomStringToDateConverter());
 		}
 	}
+	
 }

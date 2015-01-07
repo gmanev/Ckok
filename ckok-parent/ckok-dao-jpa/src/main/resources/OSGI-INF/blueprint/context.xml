@@ -32,4 +32,11 @@
 
 	<service ref="customerDAO" interface="net.nbt.ckok.model.dao.CustomerDAO" />
 
+	<bean id="productTypeDAO" class="net.nbt.ckok.dao.jpa.impl.ProductTypeDAOImpl">
+		<jpa:context unitname="ckok" property="entityManager" />
+		<tx:transaction method="*" value="Required" />
+	</bean>
+
+	<service ref="productTypeDAO" interface="net.nbt.ckok.model.dao.ProductTypeDAO" />
+
 </blueprint>

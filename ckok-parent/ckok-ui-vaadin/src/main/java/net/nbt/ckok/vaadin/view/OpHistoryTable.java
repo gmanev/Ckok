@@ -23,10 +23,13 @@ public class OpHistoryTable extends Table {
 	}
 
 	public void setDataSource(Container newDataSource) {
-		super.setContainerDataSource(newDataSource, fields);
-		if (getSortContainerPropertyId() == null) {
-			setSortContainerPropertyId("id");
-			setSortAscending(false);
+		if (getContainerDataSource() != newDataSource) {
+			super.setContainerDataSource(newDataSource, fields);
+			if (getSortContainerPropertyId() == null) {
+				setSortContainerPropertyId("id");
+				setSortAscending(false);
+			}
+			setConverter("ts", new CustomStringToDateConverter());
 		}
 	}
 }
