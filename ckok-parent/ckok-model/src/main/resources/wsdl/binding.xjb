@@ -69,6 +69,7 @@
 					<orm:column name="NAME"></orm:column>
 				</hj:basic>
 			</jaxb:bindings>
+<!-- 			
 			<jaxb:bindings node="xsd:sequence/xsd:element[@name='contacts']">
 				<hj:many-to-many>
 					<orm:join-table name="NCC_CONTACT_CUSTOMER">
@@ -82,6 +83,7 @@
 					<orm:join-column name="CUSTOMER_ID" />
 				</hj:one-to-many>
 			</jaxb:bindings>
+ -->			
 		</jaxb:bindings>		
 
 		<!-- Contact -->

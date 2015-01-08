@@ -37,7 +37,6 @@ public class CustomerBeanQuery extends CkokBeanQuery<Customer> {
 			size = getService().customersQuickSearchCount(
 					new CustomersQuickSearchCount(searchString)).getCount();
 		}
-		System.out.println(size);
 		return size;
 	}
 
@@ -50,7 +49,6 @@ public class CustomerBeanQuery extends CkokBeanQuery<Customer> {
 						searchString,
 						getOrderBy());
 		List<Customer> list = getService().customersQuickSearch(parameters).getReturn();
-		System.out.println("list:" + list.size());
 		return list;
 	}
 

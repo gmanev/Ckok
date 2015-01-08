@@ -1,10 +1,11 @@
 package net.nbt.ckok.dao.jpa.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -30,21 +31,20 @@ public class CustomerDAOImpl extends GenericDAOImpl<Customer> implements Custome
 		cq.where(quickSearchWhere(cb, p, searchString));
 
 		if (orderBy != null) {
+			List<Order> o = new ArrayList<Order>();
 			Path<?> field;
 			String name = orderBy.getAttributeName();
 			field = p.get(name);
-			if (orderBy.isAscending()) {
-				cq.orderBy(cb.asc(field));	
-			}
-			else {
-				cq.orderBy(cb.desc(field));
-			}
+			o.add(orderBy.isAscending() ?
+					cb.asc(field) : cb.desc(field));			
+			o.add(cb.asc(p.get(Customer_.id)));
+			cq.orderBy(o);
 		}
 
-		TypedQuery<Customer> typedQuery = em.createQuery(cq);
-		typedQuery.setFirstResult(startIndex);
-		typedQuery.setMaxResults(count);
-        return typedQuery.getResultList();
+		return em.createQuery(cq)
+				.setFirstResult(startIndex)
+				.setMaxResults(count)
+				.getResultList();
 	}
 
 	@Override

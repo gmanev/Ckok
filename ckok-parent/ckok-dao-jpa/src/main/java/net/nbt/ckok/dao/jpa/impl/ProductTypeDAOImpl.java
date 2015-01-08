@@ -1,10 +1,11 @@
 package net.nbt.ckok.dao.jpa.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Root;
 
@@ -26,8 +27,8 @@ public class ProductTypeDAOImpl extends GenericDAOImpl<ProductType> implements
 		if (searchString != null && !searchString.equals("")) {
 			String pattern = "%" + searchString.toLowerCase() + "%";
 			cq.where(cb.or(
-					cb.like(cb.lower(p.get(ProductType_.name)), pattern),
-					cb.like(cb.lower(p.get(ProductType_.partnum)), pattern)
+				cb.like(cb.lower(p.get(ProductType_.name)), pattern),
+				cb.like(cb.lower(p.get(ProductType_.partnum)), pattern)
 			));
 		}
 	}
@@ -43,19 +44,18 @@ public class ProductTypeDAOImpl extends GenericDAOImpl<ProductType> implements
 
 		OrderBy orderBy = parameters.getOrderBy();
 		if (orderBy != null) {
+			List<Order> o = new ArrayList<Order>();
 			Path<?> field = p.get(orderBy.getAttributeName());
-			if (parameters.getOrderBy().isAscending()) {
-				cq.orderBy(cb.asc(field));				
-			}
-			else {
-				cq.orderBy(cb.desc(field));
-			}
+			o.add(parameters.getOrderBy().isAscending() ?
+					cb.asc(field) : cb.desc(field));
+			o.add(cb.asc(p.get(ProductType_.id)));
+			cq.orderBy(o);
 		}
 		
-		TypedQuery<ProductType> typedQuery = em.createQuery(cq);
-		typedQuery.setFirstResult(parameters.getStartIndex());
-		typedQuery.setMaxResults(parameters.getCount());
-        return typedQuery.getResultList();
+		return em.createQuery(cq)
+				.setFirstResult(parameters.getStartIndex())
+				.setMaxResults(parameters.getCount())
+				.getResultList();
 	}
 
 	@Override

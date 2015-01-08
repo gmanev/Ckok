@@ -64,19 +64,11 @@ public class CustomerView extends VerticalLayout implements View {
 	public void enter(ViewChangeEvent event) {
 		cTable.setContainerDataSource(container);
 		hTable.setDataSource(oplist.getContainer());
-		
+
 		if (cTable.getSortContainerPropertyId() == null) {
 			cTable.setSortContainerPropertyId("createdOn");
 			cTable.setSortAscending(false);
 		}
-		/*
-		ViewParameters p = new ViewParameters(event.getParameters());
-		if (p.getSearchFilter() != null) {			
-			searchField.setValue(p.getSearchFilter().getSearchString());
-			container.removeAllContainerFilters();
-			container.addContainerFilter(p.getSearchFilter());
-			container.refresh();
-		}*/
 	}
 
 	public void initLayout() {

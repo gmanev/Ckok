@@ -1,11 +1,12 @@
 package net.nbt.ckok.dao.jpa.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.ListJoin;
+import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -31,30 +32,31 @@ public class ProductDAOImpl extends GenericDAOImpl<Product> implements ProductDA
 	}
 
 	@Override
-	public List<Product> search(ProductsSearch params) {
+	public List<Product> search(ProductsSearch parameters) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
-		CriteriaQuery<Product> q = cb.createQuery(Product.class);
+		CriteriaQuery<Product> cq = cb.createQuery(Product.class);
 
-		Root<Product> p = q.from(Product.class);
-		CriteriaQuery<Product> select = q.select(p);
+		Root<Product> p = cq.from(Product.class);
 
-		if (params.getOperation() != null) {
-			Subquery<Integer> sq = select.subquery(Integer.class);
+		if (parameters.getOperation() != null) {
+			Subquery<Integer> sq = cq.subquery(Integer.class);
 			Root<Operation> operation = sq.from(Operation.class);
 			ListJoin<Operation, Product> sqProd = operation.join(Operation_.products);
 			sq.select(sqProd.get(Product_.id)).where(
-					cb.equal(operation.get(Operation_.id), params.getOperation()));
-			select.where(cb.in(p.get(Product_.id)).value(sq));
+					cb.equal(operation.get(Operation_.id), parameters.getOperation()));
+			cq.where(cb.in(p.get(Product_.id)).value(sq));
 		}
 		else {
-			select.where(quickSearchWhere(cb, p, 
-					params.getLast(), params.getSearchString()));
+			cq.where(quickSearchWhere(cb,
+					p, 
+					parameters.getLast(),
+					parameters.getSearchString()));
 		}
 
-
-		if (params.getOrderBy() != null) {
+		if (parameters.getOrderBy() != null) {
+			List<Order> o = new ArrayList<Order>();
 			Path<?> field;
-			String name = params.getOrderBy().getAttributeName();
+			String name = parameters.getOrderBy().getAttributeName();
 			if (name.equalsIgnoreCase("productType.name")) {
 				field = p.get(Product_.productType).get(ProductType_.name);
 			}
@@ -64,18 +66,16 @@ public class ProductDAOImpl extends GenericDAOImpl<Product> implements ProductDA
 			else {
 				field = p.get(name);
 			}
-			if (params.getOrderBy().isAscending()) {
-				select.orderBy(cb.asc(field));				
-			}
-			else {
-				select.orderBy(cb.desc(field));
-			}
+			o.add(parameters.getOrderBy().isAscending() ?
+					cb.asc(field) : cb.desc(field));
+			o.add(cb.asc(p.get(Product_.id)));
+			cq.orderBy(o);
 		}
 
-		TypedQuery<Product> typedQuery = em.createQuery(select);
-		typedQuery.setFirstResult(params.getStartIndex());
-		typedQuery.setMaxResults(params.getCount());
-        return typedQuery.getResultList();
+		return em.createQuery(cq)
+				.setFirstResult(parameters.getStartIndex())
+				.setMaxResults(parameters.getCount())
+				.getResultList();
 	}
 
 	@Override
@@ -95,8 +95,10 @@ public class ProductDAOImpl extends GenericDAOImpl<Product> implements ProductDA
 			countQuery.where(cb.in(from.get(Product_.id)).value(sq));
 		}
 		else {
-			countQuery.where(quickSearchWhere(cb, from, 
-				params.getLast(), params.getSearchString()));
+			countQuery.where(quickSearchWhere(cb,
+					from,
+					params.getLast(),
+					params.getSearchString()));
 		}
 
 		Long count = em.createQuery(countQuery).getSingleResult();		
@@ -137,14 +139,13 @@ public class ProductDAOImpl extends GenericDAOImpl<Product> implements ProductDA
 				));
 		cq.distinct(true);
 
-		if (parameters.getOrderBy() != null) {			
+		if (parameters.getOrderBy() != null) {
+			List<Order> o = new ArrayList<Order>();
 			Path<?> field = p.get(parameters.getOrderBy().getAttributeName());
-			if (parameters.getOrderBy().isAscending()) {
-				cq.orderBy(cb.asc(field));				
-			}
-			else {
-				cq.orderBy(cb.desc(field));
-			}
+			o.add(parameters.getOrderBy().isAscending() ?
+					cb.asc(field) : cb.desc(field));
+			o.add(cb.asc(p.get(Product_.id)));
+			cq.orderBy(o);
 		}
 
 		cq.select(cb.construct(ProductDetail.class, 
@@ -171,11 +172,11 @@ public class ProductDAOImpl extends GenericDAOImpl<Product> implements ProductDA
 				operation.get(Operation_.customer).get(Customer_.id),
 				operation.get(Operation_.customer).get(Customer_.name)
 				));
-		
-		TypedQuery<ProductDetail> typedQuery = em.createQuery(cq);
-		typedQuery.setFirstResult(parameters.getStartIndex());
-		typedQuery.setMaxResults(parameters.getCount());
-        return typedQuery.getResultList();
+
+		return em.createQuery(cq)
+				.setFirstResult(parameters.getStartIndex())
+				.setMaxResults(parameters.getCount())
+				.getResultList();
 	}
 
 	@Override
